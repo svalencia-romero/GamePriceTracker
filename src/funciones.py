@@ -1,0 +1,177 @@
+import pandas as pd
+from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from fake_useragent import UserAgent # "fake_user_agent"
+
+def carga_pagina_inicial(driver:webdriver):
+    '''
+    En esta función estamos haciendo la carga de la página inicial donde más adelante,
+    empezaremos a recoger información sobre todos los juegos de la plataforma
+    
+    argm:
+        driver:webdriver
+    
+    ''' 
+    ua = UserAgent()
+    timeout = 10
+    
+    # lista_tiempo = [3,3.1,3.2]
+    #rechazamos cookies
+
+    try:
+        butt_coo = EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img'))
+        WebDriverWait(driver, timeout).until(butt_coo)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+    rechazar_cookies = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img')
+    rechazar_cookies.click()
+
+    #vamos a la pestaña de explora
+
+    try:
+        expl_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a'))
+        WebDriverWait(driver, timeout).until(expl_butt)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+    explora = driver.find_element(By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a')
+    explora.click()
+
+    #return
+
+    # Si queremos ordenar en ascendente 
+    # plat
+    
+    try:
+        sort_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button'))
+        WebDriverWait(driver, timeout).until(sort_butt)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+
+    sort_plat = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button')
+    sort_plat.click()
+
+
+    #ordenamos
+
+    try:
+        sort_g = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/header/button'))
+        WebDriverWait(driver, timeout).until(sort_g)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+
+    sort_gam = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/header/button')
+    sort_gam.click()
+
+    #AZ
+
+
+    try:
+        sort_az_ = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/div/span/label[3]'))
+        WebDriverWait(driver, timeout).until(sort_az_)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+    sort_az = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/div/span/label[3]')
+    sort_az.click()
+   
+
+    driver.implicitly_wait(10)
+
+    return
+    
+            
+def pagina_concreta_carga(pagina:int,driver:webdriver):
+    """Cargamos una página concreta para poder recuperar 
+    la información que ha dado error y hemos perdido.
+
+    Args:
+        pagina (int): Pagina que queremos cargar
+        driver (webdriver): driver 
+    """
+    pag = 1
+    while pag != pagina:
+        next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
+        next_page.click()
+        pag += 1
+        
+def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
+    """
+
+    Args:
+        df_webscrap (pd.DataFrame): Dataframe que estamos guardando con el web scrapping y queremos limpiar
+        
+    """
+    
+    # Genero
+    df_webscrap["Genero"] = df_webscrap["Genero"].str.replace(" ","")
+    df_webscrap["Genero"] = df_webscrap["Genero"].str.replace("Juegosderol","Rol").str.replace("Juegosdedisparos","Shooter").str.replace("Juegosdedisparos","Shooter")
+    df_webscrap["Genero"] = df_webscrap["Genero"].str.split(r'[^A-zÀ-ÿ_ ]')
+    
+    #Plataforma
+    df_webscrap["Plataforma"] = df_webscrap["Plataforma"].str.replace(" ","")
+    df_webscrap["Plataforma"] = df_webscrap["Plataforma"].str.split(r'[^0-9A-zÀ-ÿ_ ]')
+    
+    #Numero de calificaciones
+    df_webscrap["Número de calificaciones"] = df_webscrap["Número de calificaciones"].str.replace(" calificaciones",'').str.replace(".","")
+    df_webscrap["Número de calificaciones"] = df_webscrap["Número de calificaciones"].str.replace("No hay información", "0").astype(int)
+
+    #  Calificación 5 estrellas convertido a float
+    df_webscrap["Calificación 5 estrellas"] = df_webscrap["Calificación 5 estrellas"].str.replace(" %",'').str.replace(".","")
+    df_webscrap["Calificación 5 estrellas"] = df_webscrap["Calificación 5 estrellas"].str.replace("No hay información", "0").astype(int)
+    #  Calificación 4 estrellas convertido a float
+    df_webscrap["Calificación 4 estrellas"] = df_webscrap["Calificación 4 estrellas"].str.replace(" %",'').str.replace(".","")
+    df_webscrap["Calificación 4 estrellas"] = df_webscrap["Calificación 4 estrellas"].str.replace("No hay información", "0").astype(int)
+    #  Calificación 3 estrellas convertido a float
+    df_webscrap["Calificación 3 estrellas"] = df_webscrap["Calificación 3 estrellas"].str.replace(" %",'').str.replace(".","")
+    df_webscrap["Calificación 3 estrellas"] = df_webscrap["Calificación 3 estrellas"].str.replace("No hay información", "0").astype(int)
+
+    #  Calificación 2 estrellas convertido a float
+    df_webscrap["Calificación 2 estrellas"] = df_webscrap["Calificación 2 estrellas"].str.replace(" %",'').str.replace(".","")
+    df_webscrap["Calificación 2 estrellas"] = df_webscrap["Calificación 2 estrellas"].str.replace("No hay información", "0").astype(int)
+    #  Calificación 1 estrella convertido a float
+    df_webscrap["Calificación 1 estrella"] = df_webscrap["Calificación 1 estrella"].str.replace(" %",'').str.replace(".","")
+    df_webscrap["Calificación 1 estrella"] = df_webscrap["Calificación 1 estrella"].str.replace("No hay información", "0").astype(int)
+    df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].str.replace("No hay información",'0') 
+
+    #Precio actual sin Playstation Plus
+    df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
+    df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].str.replace(",",".")
+    df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].astype(float)
+
+    #Precio actual con Playstation Plus
+    df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
+    df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].str.replace(",",".")
+    df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].astype(float)
+
+    #Precio Original sin Playstation Plus
+    df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
+    df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].str.replace(",",".")
+    df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].astype(float)
+
+    #Precio Otiginal con Playstation Plus
+    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
+    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace(",",".")
+    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].astype(float)
+
+    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].fillna(df_webscrap["Precio original sin PSN"])
+
+    # id de cada juego que es unico
+    df_webscrap["id_juego"] = df_webscrap["id_juego"].astype(str)
+
+    #Fecha de lanzamiento
+    df_webscrap["Lanzamiento"] = pd.to_datetime(df_webscrap["Lanzamiento"], dayfirst=True)
+
+    #Día y hora del momento
+    df_webscrap["Día y hora"] = pd.to_datetime(df_webscrap["Día y hora"])
+
+    #Calificación del juego 
+    df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].astype(float)
