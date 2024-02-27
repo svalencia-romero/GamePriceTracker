@@ -265,6 +265,8 @@ while numero_juegos != len(df_juegos):
     except:
         # Volvemos a hacer la carga completa de la pagina
         print(f"Error en la carga juego {game}, pagina {page}")
+        
+        # Guardamos los errores en una lista
         list_error = []
         list_error.append((game,page))
         driver.quit()

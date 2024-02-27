@@ -160,12 +160,14 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     #Precio Otiginal con Playstation Plus
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace(",",".")
-    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].astype(float)
-
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].fillna(df_webscrap["Precio original sin PSN"])
+    # df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].astype(float)
+
+    
 
     # id de cada juego que es unico
     df_webscrap["id_juego"] = df_webscrap["id_juego"].astype(str)
+    df_webscrap["id_juego"] = df_webscrap["id_juego"].astype(int)
 
     #Fecha de lanzamiento
     df_webscrap["Lanzamiento"] = pd.to_datetime(df_webscrap["Lanzamiento"], dayfirst=True)
@@ -175,3 +177,5 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
 
     #Calificación del juego 
     df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].astype(float)
+    
+    return df_webscrap
