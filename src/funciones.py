@@ -88,6 +88,8 @@ def carga_pagina_inicial(driver:webdriver):
 
     return
     
+
+
             
 def pagina_concreta_carga(pagina:int,driver:webdriver):
     """Cargamos una página concreta para poder recuperar 
@@ -103,6 +105,9 @@ def pagina_concreta_carga(pagina:int,driver:webdriver):
         next_page.click()
         pag += 1
         
+# def recuperar_datos_erroneos((game,page,driver)):
+#     pagina_concreta_carga(pagina,)
+    
 def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     """
 
@@ -179,3 +184,7 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].astype(float)
     
     return df_webscrap
+
+
+
+    
