@@ -45,6 +45,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     rechazar_cookies = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img')
     rechazar_cookies.click()
+    driver.implicitly_wait(10)
 
     #vamos a la pestaña de explora
 
@@ -56,6 +57,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     explora = driver.find_element(By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a')
     explora.click()
+    driver.implicitly_wait(10)
 
     #return
 
@@ -71,6 +73,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     sort_plat = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button')
     sort_plat.click()
+    driver.implicitly_wait(10)
 
 
     #ordenamos
@@ -84,6 +87,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     sort_gam = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/header/button')
     sort_gam.click()
+    driver.implicitly_wait(10)
 
     #AZ
 
@@ -162,21 +166,25 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].str.replace("No hay información",'0') 
 
     #Precio actual sin Playstation Plus
+    df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].str.replace("No hay información","0.00")
     df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].str.replace(",",".")
     df_webscrap["Precio actual sin PSN"] = df_webscrap["Precio actual sin PSN"].astype(float)
 
     #Precio actual con Playstation Plus
+    df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].str.replace("No hay información","0.00")
     df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].str.replace(",",".")
     df_webscrap["Precio actual con PSN"] = df_webscrap["Precio actual con PSN"].astype(float)
 
     #Precio Original sin Playstation Plus
+    df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].str.replace("No hay información","0.00")
     df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].str.replace(",",".")
     df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].astype(float)
 
     #Precio Otiginal con Playstation Plus
+    df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace("No hay información","0.00")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace(",",".")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].fillna(df_webscrap["Precio original sin PSN"])
@@ -189,12 +197,14 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     df_webscrap["id_juego"] = df_webscrap["id_juego"].astype(int)
 
     #Fecha de lanzamiento
+    df_webscrap["Lanzamiento"] = df_webscrap["Lanzamiento"].str.replace("No hay información", "01/01/2000")
     df_webscrap["Lanzamiento"] = pd.to_datetime(df_webscrap["Lanzamiento"], dayfirst=True)
 
     #Día y hora del momento
     df_webscrap["Día y hora"] = pd.to_datetime(df_webscrap["Día y hora"])
 
-    #Calificación del juego 
+    #Calificación del juego
+    df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].str.replace("No hay información","0.00")
     df_webscrap["Calificación PSN"] = df_webscrap["Calificación PSN"].astype(float)
     
     return df_webscrap

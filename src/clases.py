@@ -31,7 +31,7 @@ class info_game:
                 try:
                     calificacion_list.append(self.sopa.find(self.etiq, attrs=self.atribs[i]).get_text())
                 except:
-                    calificacion_list.append(0)
+                    calificacion_list.append(mensaje_concreto_error_df)
                 
             return calificacion_list
         else:

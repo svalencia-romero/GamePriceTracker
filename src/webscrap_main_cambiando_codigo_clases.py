@@ -16,6 +16,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+# Timing
+start_time = datetime.now()
 
 # MEJORANDO EL SCRAPEO CON CLASES Y FUNCIONES INTEGRADAS
 
@@ -28,12 +30,11 @@ driver,service,options = f.carga_driver()
 df_juegos = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Plataforma","Genero","Compañia",
                                 "Lanzamiento","Idiomas","Calificación PSN","Número de calificaciones","Calificación 5 estrellas",
                                 "Calificación 4 estrellas","Calificación 3 estrellas","Calificación 2 estrellas",
-                                "Calificación 1 estrella","Precio original sin PSN","Precio actual sin PSN","Precio original con PSN","Precio actual con PSN"]) #,"Precio con mayor rebaja"
-
+                                "Calificación 1 estrella","Precio original sin PSN","Precio actual sin PSN","Precio original con PSN","Precio actual con PSN"])
 
 driver.get(v.link_inicial)
 f.carga_pagina_inicial(driver)
-numero_juegos = f.numero_de_juegos(driver,400) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
+numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 
 while numero_juegos != len(df_juegos):
     try:
@@ -74,7 +75,7 @@ while numero_juegos != len(df_juegos):
 
         id_juego = re.findall(r"\d+",href_valor)
         id_juego = int(id_juego[0])
-        titulo = title_info.caracteristica_tipo("Error al recoger el título")
+        titulo = title_info.caracteristica_tipo("No hay información")
         # Día y hora de webscrappeo
         
         fecha_webs = datetime.now()
@@ -84,65 +85,65 @@ while numero_juegos != len(df_juegos):
         
         org_price_without_psn = c.info_game(soup,"span",[{"class":"psw-t-title-s psw-c-t-2 psw-t-strike"},
                                                     {"class":"psw-t-title-m"}])
-        precio_original_sn_psn = org_price_without_psn.caracteristica_tipo("Error al recoger precio original sin psn")
+        precio_original_sn_psn = org_price_without_psn.caracteristica_tipo("No hay información")
 
         # Precio original con PSN
         
         org_price_with_psn = c.info_game(soup,"span",[{'data-qa':'mfeCtaMain#offer1#originalPrice','class':'psw-t-title-s psw-c-t-2 psw-t-strike'},
                                                     {"class":"psw-t-title-s psw-c-t-2 psw-t-strike"},{"class":"psw-t-title-m"}])
-        precio_original_cn_psn = org_price_with_psn.caracteristica_tipo("Error al recoger precio original con psn")
+        precio_original_cn_psn = org_price_with_psn.caracteristica_tipo("No hay información")
 
         # Precio actual sin PSN
         
         act_price_without_psn = c.info_game(soup,"span",[{'class':"psw-t-title-m psw-m-r-4"},{"class":"psw-t-title-m"}])
-        precio_actual_sn_psn = act_price_without_psn.caracteristica_tipo("Error al recoger precio actual sin psn")
+        precio_actual_sn_psn = act_price_without_psn.caracteristica_tipo("No hay información")
 
         # Precio actual con PSN
         
         act_price_with_psn = c.info_game(soup,"span",[{'data-qa':'mfeCtaMain#offer1#finalPrice','class':'psw-t-title-m psw-m-r-4'},
                                                     {'class':"psw-t-title-m psw-m-r-4"},{"class":"psw-t-title-m"}])
-        precio_actual_cn_psn = act_price_with_psn.caracteristica_tipo("Error al recoger precio original con psn")
+        precio_actual_cn_psn = act_price_with_psn.caracteristica_tipo("No hay información")
 
         #Plataforma
         
         pltform = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
                                     'data-qa':'gameInfo#releaseInformation#platform-value'}])
-        plataforma = pltform.caracteristica_tipo("Error al recoger plataforma")
+        plataforma = pltform.caracteristica_tipo("No hay información")
 
         # Genero
         
         gnr = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
                                     'data-qa':'gameInfo#releaseInformation#genre-value'}])
-        genero = gnr.caracteristica_tipo("Error al recoger género")
+        genero = gnr.caracteristica_tipo("No hay información")
 
         # Compañia
         
         company = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
                                         'data-qa':'gameInfo#releaseInformation#publisher-value'}])
-        compania = company.caracteristica_tipo("Error al recoger la compañia")
+        compania = company.caracteristica_tipo("No hay información")
 
         # Lanzamiento
         
         lanz = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
                                     'data-qa':'gameInfo#releaseInformation#releaseDate-value'}])
-        lanzamiento = lanz.caracteristica_tipo("Error al recoger Lanzamiento")
+        lanzamiento = lanz.caracteristica_tipo("No hay información")
         
         # Idiomas
         
         lng = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
                                     'data-qa':'gameInfo#releaseInformation#subtitles-value'}])
-        idiomas = lng.caracteristica_tipo("Error al recoger Idiomas")
+        idiomas = lng.caracteristica_tipo("No hay información")
 
         # Nº de calificaciones
 
         num_cal = c.info_game(soup,"span",[{'class':'psw-c-t-2 psw-t-secondary',
                                         'data-qa':'mfe-star-rating#overall-rating#total-ratings'}])
-        num_calificaciones = num_cal.caracteristica_tipo("Error al recoger num calificaciones")
+        num_calificaciones = num_cal.caracteristica_tipo("No hay información")
         
         # Calificación PSN
         
         cal_psn = c.info_game(soup,"div",[{'class':'psw-t-subtitle psw-t-bold psw-l-line-center','data-qa':'mfe-game-title#average-rating'}])
-        calificacion = cal_psn.caracteristica_tipo("Error al recoger Calificación PSN")
+        calificacion = cal_psn.caracteristica_tipo("No hay información")
         
         # Calificaciones por estrellas
 
@@ -152,7 +153,7 @@ while numero_juegos != len(df_juegos):
                                     {'class':'psw-t-body','data-qa':'mfe-star-rating#overall-rating#rating-progress4#percentage-label'},
                                     {'class':'psw-t-body','data-qa':'mfe-star-rating#overall-rating#rating-progress5#percentage-label'}])
 
-        list_stars = cal_stars.caracteristica_tipo("Error al obtener calificaciones por estrella",cal=True)
+        list_stars = cal_stars.caracteristica_tipo("No hay información",cal=True)
         calificacion_1 = list_stars[0]
         calificacion_2 = list_stars[1]
         calificacion_3 = list_stars[2]
@@ -186,11 +187,12 @@ while numero_juegos != len(df_juegos):
         elif len(df_juegos) == v.limite:
             # Volvemos a hacer la carga completa de la pagina
             driver.quit()
-            time.sleep(5)
+            del driver
             driver,service,options = f.carga_driver()
+            driver.get(v.link_inicial)
             f.carga_pagina_inicial(driver)
             f.pagina_concreta_carga(v.page,driver)
-            limite = limite + 300
+            v.limite = v.limite + 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
         # elif numero_juegos == len(df_juegos):
@@ -203,13 +205,13 @@ while numero_juegos != len(df_juegos):
         # Guardamos los errores en una lista
         list_error = []
         list_error.append((v.game,v.page))
-        driver.quit()
-        
+        driver.quit()       
+        del driver
         driver,service,options = f.carga_driver()
-        time.sleep(5)
+        driver.get(v.link_inicial)
         f.carga_pagina_inicial(driver)
         f.pagina_concreta_carga(v.page,driver)
-        v.game += 1
+        # v.game += 1
                   
 driver.quit()
 
@@ -217,3 +219,7 @@ fecha_acabado = str(datetime.now())
 df_juegos_limpio = f.limpieza_df(df_juegos)
 # df_juegos_limpio.to_csv(f"../csv_s/csv_{fecha_acabado[:10]}.csv",index=False)
 df_juegos_limpio.to_csv("../csv_s/csv_prueba_new_code.csv",index=False) # Convertir a csv para pruebas
+
+end_time = datetime.now()
+total_time = end_time - start_time
+print(f"Finalizado el webscrapeo de {numero_juegos} juegos en {total_time} ")
