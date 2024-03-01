@@ -1,6 +1,7 @@
 """
 Importamos las librerias necesarias para hacer nuestro webscrapping
 """
+import variables as v
 import funciones as f
 import re # Expresiones regulares 
 import time
@@ -25,15 +26,10 @@ service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webd
 options = webdriver.ChromeOptions()
 # options.add_argument('--start-maximized') SOLO EN PC SOBREMESA si fuera necesario.
 
-
-
 # MEJORANDO EL SCRAPEO IDENTIFICANDO EL SOURCE Y OBTENIENDO TODOS LOS DATOS DE ELLA
 
 ### PRUEBA FUNCIONAL WEBSCRAPING DE X JUEGOS Y TIEMPO UTILIZADO ### Completamente funcional, pocos campos, meter más cosas genero etc... (Prueba con timeouts en vez de random choice de tiempos)
 # Reset df
-
-
-
 ua = UserAgent()
 service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
 options = webdriver.ChromeOptions()
@@ -50,40 +46,19 @@ driver = webdriver.Chrome(service=service, options=options)
 link_inicial = "https://store.playstation.com/"
 driver.get(link_inicial)
 
-
 lista_tiempo = [3,3.1,3.2]
 
 f.carga_pagina_inicial(driver)
 
-# Mostrar un numero de juegos limitado para que no nos salte error de maximo numero de intentos.
-limite = 300 # limite de juegos que se van multiplicando por 2 max abajo para poder ir recopilando la info
+numero_juegos = f.numero_de_juegos(driver,10) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 
-'''
-Aquí tenemos el código para meter de manera automatica el limite del numero de juegos
-Si queremos limitar el numero de juegos comentar las 5 lineas siguiente para comprobar que el flujo está correcto.
-
-'''
-
-# page_source = driver.page_source
-# soup_numero_juegos = bs(page_source, 'html.parser')
-# numero_juegos = soup_numero_juegos.find('div', class_= "ems-sdk-active-filters psw-m-b-8 psw-m-t-4").get_text()
-# numero_juegos = re.findall(r"\d+",numero_juegos)
-# numero_juegos = int(numero_juegos[0])
-# print(numero_juegos)
-numero_juegos = 500
-
-
-contador_juegos_real = 1 # Esta linea está creada para comprobar que el flujo de los cambios de páginas con sus juegos está correcto.
-# seleccion de juego
-page = 1
-game = 0 # Establecemos el primer juego que estará en cont = 1, pero lo establecemos en 0 para iniciarlo
 while numero_juegos != len(df_juegos):
     try:
         try:
-            sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[{game+1}]/div/a'))
+            sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[{v.game+1}]/div/a'))
             WebDriverWait(driver, timeout).until(sel_game)
         except TimeoutException:
-            print(f"Timed out waiting for game to appear, game number {game}")
+            print(f"Timed out waiting for game to appear, game number {v.game}")
             
         driver.implicitly_wait(10)
         
@@ -92,7 +67,7 @@ while numero_juegos != len(df_juegos):
             headers = {'User-Agent': ua.random}
             response = requests.get(url, headers=headers)
             soup_pagina_entera = bs(response.text,features="lxml")
-            url_game = soup_pagina_entera.select_one(f'[data-qa="ems-sdk-grid#productTile{game}"] a')
+            url_game = soup_pagina_entera.select_one(f'[data-qa="ems-sdk-grid#productTile{v.game}"] a')
             href_valor = url_game.get('href')
             link_juego = link_inicial + href_valor
         # obtenemos info del juego         
@@ -101,7 +76,7 @@ while numero_juegos != len(df_juegos):
             soup = bs(response.text,features="lxml")
             
         except Exception as e:
-            print(f"Error al obtener la URL: error en el juego{game}, página{page}")
+            print(f"Error al obtener la URL: error en el juego{v.game}, página{v.page}")
             
         
         # Aquí vamos a coger el soup de cada url de cada juego para obtener la info
@@ -233,18 +208,18 @@ while numero_juegos != len(df_juegos):
         
         # time.sleep(random.choice(lista_tiempo))
         # chequeo juegos
-        print("contador real",contador_juegos_real,"contador_en_df",game,page)
-        contador_juegos_real += 1
-        game += 1
+        print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
+        v.contador_juegos_real += 1
+        v.game += 1
 
         #Comprobar error aquí
-        if game == 24:
+        if v.game == 24:
             next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
             next_page.click()
-            page += 1      
-            game = 0
+            v.page += 1      
+            v.game = 0
             # time.sleep(random.choice(lista_tiempo))
-        elif len(df_juegos) == limite:
+        elif len(df_juegos) == v.limite:
             # Volvemos a hacer la carga completa de la pagina
             driver.quit()
             time.sleep(5)
@@ -254,7 +229,7 @@ while numero_juegos != len(df_juegos):
             options.add_argument("--headless=new")
             driver.get("https://store.playstation.com/")
             f.carga_pagina_inicial(driver)
-            f.pagina_concreta_carga(page,driver)
+            f.pagina_concreta_carga(v.page,driver)
             limite = limite + 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
@@ -264,11 +239,11 @@ while numero_juegos != len(df_juegos):
             continue
     except:
         # Volvemos a hacer la carga completa de la pagina
-        print(f"Error en la carga juego {game}, pagina {page}")
+        print(f"Error en la carga juego {v.game}, pagina {v.page}")
         
         # Guardamos los errores en una lista
         list_error = []
-        list_error.append((game,page))
+        list_error.append((v.game,v.page))
         driver.quit()
         driver = webdriver.Chrome(service=service, options=options)
         service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
@@ -276,15 +251,12 @@ while numero_juegos != len(df_juegos):
         options.add_argument("--headless=new")
         driver.get("https://store.playstation.com/")
         f.carga_pagina_inicial(driver)
-        f.pagina_concreta_carga(page,driver)
-        game += 1
+        f.pagina_concreta_carga(v.page,driver)
+        v.game += 1
                   
 driver.quit()
 
-
-
-
-
 fecha_acabado = str(datetime.now())
 df_juegos_limpio = f.limpieza_df(df_juegos)
-df_juegos_limpio.to_csv(f"../csv_s/csv_{fecha_acabado[:10]}.csv",index=False)
+# df_juegos_limpio.to_csv(f"../csv_s/csv_{fecha_acabado[:10]}.csv",index=False)
+df_juegos_limpio.to_csv("../csv_s/csv_prueba_new_code.csv",index=False)

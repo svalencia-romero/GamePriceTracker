@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -185,6 +186,15 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     
     return df_webscrap
 
-
+def numero_de_juegos(driver,numero=False):
+    if numero != bool:
+       numero_juegos = numero
+    else:
+        page_source = driver.page_source
+        soup_numero_juegos = bs(page_source, 'html.parser')
+        numero_juegos = soup_numero_juegos.find('div', class_= "ems-sdk-active-filters psw-m-b-8 psw-m-t-4").get_text()
+        numero_juegos = re.findall(r"\d+",numero_juegos)
+        numero_juegos = int(numero_juegos[0])
+    return numero_juegos
 
     
