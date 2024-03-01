@@ -9,6 +9,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from fake_useragent import UserAgent # "fake_user_agent"
 
+def carga_driver():
+    """
+
+    Returns:
+        _type_: _description_
+    """
+    service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    # options.add_argument('--start-maximized') SOLO EN PC SOBREMESA si fuera necesario.
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver,service,options
+
 def carga_pagina_inicial(driver:webdriver):
     '''
     En esta función estamos haciendo la carga de la página inicial donde más adelante,
@@ -196,5 +209,7 @@ def numero_de_juegos(driver,numero=False):
         numero_juegos = re.findall(r"\d+",numero_juegos)
         numero_juegos = int(numero_juegos[0])
     return numero_juegos
+
+
 
     
