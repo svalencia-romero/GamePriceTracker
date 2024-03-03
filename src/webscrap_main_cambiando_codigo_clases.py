@@ -192,7 +192,7 @@ while numero_juegos != len(df_juegos):
             driver.get(v.link_inicial)
             f.carga_pagina_inicial(driver)
             f.pagina_concreta_carga(v.page,driver)
-            v.limite = v.limite + 300
+            v.limite += 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
         # elif numero_juegos == len(df_juegos):
@@ -203,8 +203,7 @@ while numero_juegos != len(df_juegos):
         # Volvemos a hacer la carga completa de la página
         print(f"Error en la carga juego {v.game}, página {v.page}")
         # Guardamos los errores en una lista
-        list_error = []
-        list_error.append((v.game,v.page))
+        v.list_error.append((v.game,v.page))
         driver.quit()       
         del driver
         driver,service,options = f.carga_driver()
@@ -216,10 +215,22 @@ while numero_juegos != len(df_juegos):
 driver.quit()
 
 fecha_acabado = str(datetime.now())
-df_juegos_limpio = f.limpieza_df(df_juegos)
-# df_juegos_limpio.to_csv(f"../csv_s/csv_{fecha_acabado[:10]}.csv",index=False)
-df_juegos_limpio.to_csv("../csv_s/csv_prueba_new_code.csv",index=False) # Convertir a csv para pruebas
+
+df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}.csv",index=False)
+print("Grabado con éxito en csv")
 
 end_time = datetime.now()
 total_time = end_time - start_time
 print(f"Finalizado el webscrapeo de {numero_juegos} juegos en {total_time} ")
+
+if len(v.list_error) > 0:
+    print("Juegos con errores",v.list_error)
+else:
+    print("Web scrapeo sin errores")
+
+
+#Limpio df y paso a limpio csv
+# df_juegos_limpio = f.limpieza_df(df_juegos) # Comentamos por el momento para que no explote
+# df_juegos_limpio.to_csv(f"../csv_s/csv_limpio/csv_{fecha_acabado[:10]}.csv",index=False)
+
+

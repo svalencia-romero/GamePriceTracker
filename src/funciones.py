@@ -144,6 +144,7 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     df_webscrap["Plataforma"] = df_webscrap["Plataforma"].str.split(r'[^0-9A-zÀ-ÿ_ ]')
     
     #Numero de calificaciones
+    df_webscrap["Número de calificaciones"] = df_webscrap["Número de calificaciones"].str.replace('[A-z]','0', regex = True)
     df_webscrap["Número de calificaciones"] = df_webscrap["Número de calificaciones"].str.replace(" calificaciones",'').str.replace(".","")
     df_webscrap["Número de calificaciones"] = df_webscrap["Número de calificaciones"].str.replace("No hay información", "0").astype(int)
 
@@ -184,6 +185,7 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     df_webscrap["Precio original sin PSN"] = df_webscrap["Precio original sin PSN"].astype(float)
 
     #Precio Otiginal con Playstation Plus
+    
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace("No hay información","0.00")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.02").replace("Nodisponibleparacomprar","0.01").replace('Anunciado',"0.03")
     df_webscrap["Precio original con PSN"] = df_webscrap["Precio original con PSN"].str.replace(",",".")
@@ -210,14 +212,16 @@ def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     return df_webscrap
 
 def numero_de_juegos(driver,numero=False):
-    if numero != bool:
+    if numero != False:
        numero_juegos = numero
-    else:
+    elif numero == False:
         page_source = driver.page_source
         soup_numero_juegos = bs(page_source, 'html.parser')
         numero_juegos = soup_numero_juegos.find('div', class_= "ems-sdk-active-filters psw-m-b-8 psw-m-t-4").get_text()
         numero_juegos = re.findall(r"\d+",numero_juegos)
         numero_juegos = int(numero_juegos[0])
+    else:
+        print("No cargan los numeros de juegos")
     return numero_juegos
 
 
