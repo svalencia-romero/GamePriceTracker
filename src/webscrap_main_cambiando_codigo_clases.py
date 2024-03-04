@@ -34,17 +34,18 @@ df_juegos = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Plataforma"
 
 driver.get(v.link_inicial)
 f.carga_pagina_inicial(driver)
-numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
+numero_juegos = f.numero_de_juegos(driver,1000) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 
 while numero_juegos != len(df_juegos):
+    driver.implicitly_wait(10)
     try:
         try:
             sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[{v.game+1}]/div/a'))
             WebDriverWait(driver, v.timeout).until(sel_game)
         except TimeoutException:
             print(f"Timed out waiting for game to appear, game number {v.game}")
+            continue # Ponemos continue porque en ciertos juegos se queda pillado
             
-        driver.implicitly_wait(10)
         
         try:
             url = driver.current_url  
@@ -61,7 +62,7 @@ while numero_juegos != len(df_juegos):
             
         except Exception as e:
             print(f"Error al obtener la URL: error en el juego{v.game}, página{v.page}")
-            
+            continue # Ponemos continue porque en ciertos juegos se queda pillado y volvemos a reiniciar el bucle
         
         # Aquí vamos a coger el soup de cada url de cada juego para obtener la info
         
@@ -195,8 +196,6 @@ while numero_juegos != len(df_juegos):
             v.limite += 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
-        # elif numero_juegos == len(df_juegos):
-        #     break
         else:
             continue
     except:
@@ -216,7 +215,12 @@ driver.quit()
 
 fecha_acabado = str(datetime.now())
 
-df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}.csv",index=False)
+# Para todo completo juegos
+# df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}.csv",index=False)
+# print("Grabado con éxito en csv")
+
+# Para pruebas
+df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}_prueba.csv",index=False)
 print("Grabado con éxito en csv")
 
 end_time = datetime.now()
