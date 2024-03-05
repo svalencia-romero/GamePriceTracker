@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+limite = v.limite
 # Timing
 start_time = datetime.now()
 
@@ -174,14 +175,14 @@ while numero_juegos != len(df_juegos):
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
         v.contador_juegos_real += 1
         v.game += 1
-        print(f"limite {v.limite} es igual a numero juegos en df?", len(df_juegos)) # Comprobaciones de limites y por donde pasar
+        # print(f"limite {v.limite} es igual a numero juegos en df?", len(df_juegos)) # Comprobaciones de limites y por donde pasar
         #Comprobar error aquí
         if v.game == 24:
             next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
             next_page.click()
             v.page += 1      
             v.game = 0
-        elif len(df_juegos) == v.limite:
+        elif len(df_juegos) == limite:
             # Volvemos a hacer la carga completa de la pagina
             driver.quit()
             del driver
@@ -189,7 +190,7 @@ while numero_juegos != len(df_juegos):
             driver.get(v.link_inicial)
             f.carga_pagina_inicial(driver)
             f.pagina_concreta_carga(v.page,driver)
-            v.limite += 300
+            limite += 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
         else:
@@ -212,12 +213,12 @@ driver.quit()
 fecha_acabado = str(datetime.now())
 
 # Para todo completo juegos
-# df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}.csv",index=False)
-# print("Grabado con éxito en csv")
-
-# Para pruebas
-df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}_prueba.csv",index=False)
+df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}.csv",index=False)
 print("Grabado con éxito en csv")
+
+# # Para pruebas
+# df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}_prueba.csv",index=False)
+# print("Grabado con éxito en csv")
 
 end_time = datetime.now()
 total_time = end_time - start_time

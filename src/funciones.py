@@ -31,11 +31,8 @@ def carga_pagina_inicial(driver:webdriver):
         driver:webdriver
     
     ''' 
-    ua = UserAgent()
     timeout = 10
-    
-    # lista_tiempo = [3,3.1,3.2]
-    #rechazamos cookies
+
 
     try:
         butt_coo = EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img'))
@@ -57,7 +54,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     explora = driver.find_element(By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a')
     explora.click()
-    driver.implicitly_wait(10)
+    
 
     #return
 
@@ -68,47 +65,10 @@ def carga_pagina_inicial(driver:webdriver):
         sort_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button'))
         WebDriverWait(driver, timeout).until(sort_butt)
     except TimeoutException:
-        print("Timed out waiting for sort button to appear")
-
-
-    sort_plat = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button')
-    sort_plat.click()
-    driver.implicitly_wait(10)
-
-
-    #ordenamos
-
-    try:
-        sort_g = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/header/button'))
-        WebDriverWait(driver, timeout).until(sort_g)
-    except TimeoutException:
-        print("Timed out waiting for sort button to appear")
-
-
-    sort_gam = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/header/button')
-    sort_gam.click()
-    driver.implicitly_wait(10)
-
-    #AZ
-
-
-    try:
-        sort_az_ = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/div/span/label[3]'))
-        WebDriverWait(driver, timeout).until(sort_az_)
-    except TimeoutException:
-        print("Timed out waiting for sort button to appear")
-
-    sort_az = driver.find_element(By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[3]/div/div/div/div[3]/div[1]/div/div/span/label[3]')
-    sort_az.click()
-   
-
-    driver.implicitly_wait(10)
+        print("Timed out waiting for sort button to appear") 
 
     return
-    
-
-
-            
+              
 def pagina_concreta_carga(pagina:int,driver:webdriver):
     """Cargamos una página concreta para poder recuperar 
     la información que ha dado error y hemos perdido.
@@ -123,8 +83,6 @@ def pagina_concreta_carga(pagina:int,driver:webdriver):
         next_page.click()
         pag += 1
         
-# def recuperar_datos_erroneos((game,page,driver)):
-#     pagina_concreta_carga(pagina,)
     
 def limpieza_df(df_webscrap:pd.DataFrame)-> pd.DataFrame:
     """
