@@ -34,7 +34,7 @@ df_juegos = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Plataforma"
 
 driver.get(v.link_inicial)
 f.carga_pagina_inicial(driver)
-numero_juegos = f.numero_de_juegos(driver,601) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
+numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 
 while numero_juegos != len(df_juegos):
     driver.implicitly_wait(10)
@@ -174,7 +174,7 @@ while numero_juegos != len(df_juegos):
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
         v.contador_juegos_real += 1
         v.game += 1
-        print(f"limite {v.limite} es igual a ", len(df_juegos)) # Comprobaciones de limites y por donde pasar
+        print(f"limite {v.limite} es igual a numero juegos en df?", len(df_juegos)) # Comprobaciones de limites y por donde pasar
         #Comprobar error aquí
         if v.game == 24:
             next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
