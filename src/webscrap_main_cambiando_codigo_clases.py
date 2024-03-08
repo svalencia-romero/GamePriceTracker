@@ -4,7 +4,8 @@ Importamos las librerias necesarias para hacer nuestro webscrapping
 import clases as c
 import variables as v
 import funciones as f
-import re # Expresiones regulares 
+import re # Expresiones regulares
+import json 
 import time
 import requests
 import pandas as pd
@@ -15,8 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-
-limite = v.limite
+lista_recheck = []
 # Timing
 start_time = datetime.now()
 
@@ -56,13 +56,29 @@ while numero_juegos != len(df_juegos):
             url_game = soup_pagina_entera.select_one(f'[data-qa="ems-sdk-grid#productTile{v.game}"] a')
             href_valor = url_game.get('href')
             link_juego = v.link_inicial + href_valor
+            
+            id_juego = re.findall(r"\d+",href_valor)
+            id_juego = int(id_juego[0])
+            
         # obtenemos info del juego         
             headers = {'User-Agent': ua.random}
             response = requests.get(link_juego, headers=headers)
             soup = bs(response.text,features="lxml")
             
+            # Check ok el soup
+            try:
+                dict_comprobacion_id = soup.find("button",attrs={"data-qa":"mfeCtaMain#cta#action"}).get_attribute_list("data-telemetry-meta")[0]
+                conv_json = json.loads(dict_comprobacion_id)
+                id_juego_real_soup = int(conv_json["conceptId"])
+                if id_juego == id_juego_real_soup:
+                    print("Info Check OK")
+            except:
+                lista_recheck.append((v.game,v.page))
+                print(f"Necesita recheck {id_juego}")
+                
+              
         except Exception as e:
-            print(f"Error al obtener la URL: error en el juego{v.game}, página{v.page}")
+            print(f"Error al obtener la URL: error en el juego {v.game}, página {v.page}")
             continue # Ponemos continue porque en ciertos juegos se queda pillado y volvemos a reiniciar el bucle
         
         # Aquí vamos a coger el soup de cada url de cada juego para obtener la info      
@@ -71,8 +87,6 @@ while numero_juegos != len(df_juegos):
                                     {"class":"psw-m-b-5 psw-t-title-l psw-t-size-7 psw-l-line-break-word"},
                                     {"class":"psw-m-b-5 psw-t-title-l psw-t-size-8 psw-l-line-break-word"}])
 
-        id_juego = re.findall(r"\d+",href_valor)
-        id_juego = int(id_juego[0])
         titulo = title_info.caracteristica_tipo("No hay información")
         # Día y hora de webscrappeo
         
@@ -182,7 +196,7 @@ while numero_juegos != len(df_juegos):
             next_page.click()
             v.page += 1      
             v.game = 0
-        elif len(df_juegos) == limite:
+        elif len(df_juegos) == v.limite:
             # Volvemos a hacer la carga completa de la pagina
             driver.quit()
             del driver
@@ -190,7 +204,7 @@ while numero_juegos != len(df_juegos):
             driver.get(v.link_inicial)
             f.carga_pagina_inicial(driver)
             f.pagina_concreta_carga(v.page,driver)
-            limite += 300
+            v.limite += 300
             print("Número de juegos completados de webscrapear", str(len(df_juegos)))
             continue
         else:
@@ -229,6 +243,10 @@ if len(v.list_error) > 0:
 else:
     print("Web scrapeo sin errores")
 
+if len(lista_recheck) > 0:
+    print("Se necesita checkear estos juegos",lista_recheck)
+else:
+    print("Web scrapeo sin errores")
 
 #Limpio df y paso a limpio csv
 # df_juegos_limpio = f.limpieza_df(df_juegos) # Comentamos por el momento para que no explote
