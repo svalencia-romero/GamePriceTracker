@@ -73,7 +73,7 @@ while numero_juegos != len(df_juegos):
                 if id_juego == id_juego_real_soup:
                     print("Info Check OK")
             except:
-                lista_recheck.append((v.game,v.page))
+                lista_recheck.append((id_juego))
                 print(f"Necesita recheck {id_juego}")
                 
               
@@ -88,6 +88,14 @@ while numero_juegos != len(df_juegos):
                                     {"class":"psw-m-b-5 psw-t-title-l psw-t-size-8 psw-l-line-break-word"}])
 
         titulo = title_info.caracteristica_tipo("No hay información")
+        try:
+            if titulo == "No hay información":
+                dict_titulo = soup.find('button',attrs={"data-qa" : "mfeCtaMain#cta#action"}).get_attribute_list("data-telemetry-meta")
+                json_dict = json.loads(dict_titulo[0])
+                titulo = json_dict['productDetail'][0]['productName']
+        except:
+            print("Error al recoger segunda vez titulo")
+
         # Día y hora de webscrappeo
         
         fecha_webs = datetime.now()

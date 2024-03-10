@@ -44,4 +44,6 @@ class info_game:
                 except AttributeError:
                     caracarct = mensaje_concreto_error_df        
         
-            return caracarct    
+            return caracarct
+        
+        # def car_dict()    
