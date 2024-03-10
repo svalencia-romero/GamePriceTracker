@@ -45,5 +45,10 @@ class info_game:
                     caracarct = mensaje_concreto_error_df        
         
             return caracarct
-        
-        # def car_dict()    
+    
+    # def precios(self,mensaje_concreto_error,atribute_list): # Probando los diccionarios de los precios, mas preciso
+    #     """
+    #     Metodo que nos devuelve los precios
+    #     """
+    #     precio = self.sopa.find(self.etiq,attrs=self.atribs[indice]).get_attribute_list(atribute_list)[0]
+    #  Dejo comentado, la idea es coger del mismo boton todos los precios y encajarlos en precio_0 precio_1 precio_2 preci3_
