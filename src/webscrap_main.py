@@ -3,9 +3,11 @@
 """
 Importamos las librerias necesarias para hacer nuestro webscrapping
 """
-import clases as c
-import variables as v
-import funciones as f
+import sys
+sys.path.append("../")
+from utils import funciones as f
+from utils import clases as c
+from utils import variables as v
 import re # Expresiones regulares
 import json 
 import time
