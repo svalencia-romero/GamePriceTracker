@@ -45,6 +45,7 @@ driver.get(v.link_inicial)
 f.carga_pagina_inicial(driver)
 numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 
+
 while numero_juegos != len(df_juegos[0]):
     driver.implicitly_wait(10)
     try:
@@ -52,8 +53,13 @@ while numero_juegos != len(df_juegos[0]):
             sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[{v.game+1}]/div/a'))
             WebDriverWait(driver, v.timeout).until(sel_game)
         except TimeoutException:
-            print(f"Timed out waiting for game to appear, game number {v.game}")
-            continue # Ponemos continue porque en ciertos juegos se queda pillado
+            print(f"Timed out waiting for game to appear, game number {v.game}, número de intentos {v.intentos}")
+            if v.intentos == 5: # Hacemos un numero de intentos por si acaso se atasca
+                v.game += 1
+                v.intentos = 0
+                continue
+            else:
+                continue # Ponemos continue porque en ciertos juegos se queda pillado
             
         
         try:
