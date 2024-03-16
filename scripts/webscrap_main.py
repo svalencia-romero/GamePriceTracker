@@ -231,7 +231,7 @@ while numero_juegos != len(df_juegos[0]):
                     next_page.click()
                     v.page += 1      
                     v.game = 0
-                elif len(df_juegos) == v.limite:
+                elif len(df_juegos[2]) == v.limite:
                     # Volvemos a hacer la carga completa de la pagina
                     driver.quit()
                     del driver
@@ -239,7 +239,7 @@ while numero_juegos != len(df_juegos[0]):
                     driver.get(v.link_inicial)
                     f.carga_pagina_inicial(driver)
                     f.pagina_concreta_carga(v.page,driver)
-                    v.limite += 300
+                    v.limite += 100
                     print("Número de juegos completados de webscrapear", str(len(df_juegos)))
                     continue
                 else:
