@@ -1,4 +1,7 @@
 import streamlit as st
+import pandas as pd
+import re
+prueba_df = pd.read_csv("../csv_s/csv_limpio/es/csv_limpio_2024-03-13.csv")
 
 # Configuración de página
 st.set_page_config(page_title="Precios de Videojuegos", page_icon="🎮")
@@ -32,25 +35,20 @@ st.sidebar.markdown('<p style="font-family: Arial;color: #FFFFFF;font-size: 20px
 price_range = st.sidebar.slider("Precios",0,100,(0,60),key="price_range_slider",label_visibility='collapsed')
 
 # Datos de ejemplo (podrías reemplazar esto con tus propios datos)
-data = [
-    {"Juego": "The Witcher 3", "Plataforma": "PC", "Género": "RPG", "Precio": 20},
-    {"Juego": "The Last of Us Part II", "Plataforma": "PlayStation", "Género": "Acción", "Precio": 40},
-    {"Juego": "Halo Infinite", "Plataforma": "Xbox", "Género": "Shooter", "Precio": 60},
-    {"Juego": "Animal Crossing: New Horizons", "Plataforma": "Nintendo", "Género": "Simulación", "Precio": 50},
-]
+st.dataframe(prueba_df)
 
 # Filtrar datos según la selección del usuario
-filtered_data = []
-for game in data:
-    if (platform == "Todas" or game["Plataforma"] == platform) and \
-       (genre == "Todos" or game["Género"] == genre) and \
-       (price_range[0] <= game["Precio"] <= price_range[1]):
-        filtered_data.append(game)
+filtered_data = prueba_df[
+    (prueba_df["Plataforma"] == platform) |
+    (platform == "No hay información")
+    & (prueba_df["Genero"] == genre)
+    & (prueba_df["Precio actual con PSN"].between(price_range[0], price_range[1]))
+]
 
 # Mostrar resultados
 st.subheader("Resultados")
 if len(filtered_data) > 0:
-    for game in filtered_data:
-        st.write(f"**{game['Juego']}** - {game['Plataforma']} - {game['Género']} - ${game['Precio']}")
+    for index, game in filtered_data.iterrows():
+        st.write(f"**{game['Titulo']}** - {game['Plataforma']} - {game['Genero']} - €{game['Precio actual con PSN']}")
 else:
     st.warning("No se encontraron juegos que coincidan con los filtros seleccionados.")
