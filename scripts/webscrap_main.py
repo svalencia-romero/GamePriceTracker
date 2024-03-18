@@ -9,8 +9,7 @@ from utils import funciones as f
 from utils import clases as c
 from utils import variables as v
 import re # Expresiones regulares
-import json 
-# import time 
+import json
 import requests
 import pandas as pd
 from datetime import datetime

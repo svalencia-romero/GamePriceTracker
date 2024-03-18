@@ -17,8 +17,8 @@ def carga_driver():
     """
     service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    # options.add_argument('--start-maximized') SOLO EN PC SOBREMESA si fuera necesario.
+    # options.add_argument("--headless=new")
+    # options.add_argument('--start-maximized')  #SOLO EN PC SOBREMESA si fuera necesario.
     driver = webdriver.Chrome(service=service, options=options)
     return driver,service,options
 
