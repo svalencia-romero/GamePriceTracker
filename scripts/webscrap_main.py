@@ -10,7 +10,7 @@ from utils import clases as c
 from utils import variables as v
 import re # Expresiones regulares
 import json 
-import time
+# import time 
 import requests
 import pandas as pd
 from datetime import datetime
