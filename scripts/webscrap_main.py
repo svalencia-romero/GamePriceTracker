@@ -58,6 +58,7 @@ while numero_juegos != len(df_juegos[0]):
                 v.intentos = 0
                 continue
             else:
+                v.intentos += 1
                 continue # Ponemos continue porque en ciertos juegos se queda pillado
             
         
@@ -244,17 +245,32 @@ while numero_juegos != len(df_juegos[0]):
                 else:
                     continue
     except:
+        
         # Volvemos a hacer la carga completa de la página
         print(f"Error en la carga juego {v.game}, página {v.page}")
         # Guardamos los errores en una lista
-        v.list_error.append((v.game,v.page))
-        driver.quit()       
-        del driver
-        driver,service,options = f.carga_driver()
-        driver.get(v.link_inicial)
-        f.carga_pagina_inicial(driver)
-        f.pagina_concreta_carga(v.page,driver)
-        # v.game += 1
+        if v.intentos == 5: # Hacemos un numero de intentos por si acaso se atasca
+            v.game += 1
+            v.intentos = 0
+            v.list_error.append((v.game,v.page))
+            driver.quit()       
+            del driver
+            driver,service,options = f.carga_driver()
+            driver.get(v.link_inicial)
+            f.carga_pagina_inicial(driver)
+            f.pagina_concreta_carga(v.page,driver)
+            v.game += 1
+            continue
+        else:
+            v.list_error.append((v.game,v.page))
+            driver.quit()       
+            del driver
+            driver,service,options = f.carga_driver()
+            driver.get(v.link_inicial)
+            f.carga_pagina_inicial(driver)
+            f.pagina_concreta_carga(v.page,driver)
+            v.intentos += 1
+            continue # Ponemos continue porque en ciertos juegos se queda pillado
                   
 driver.quit()
 
