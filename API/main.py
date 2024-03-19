@@ -21,8 +21,10 @@ app = FastAPI()
 @app.get("/")
 async def inicio():
     return {"Bienvenida": "Bienvenid@ a la API de juegos de PSN"}
- 
-@app.get("/precios")
+
+
+
+@app.get("/precios") # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
 async def titulo(busqueda:str):
     
     # Cargamos página inicial
@@ -44,6 +46,7 @@ async def titulo(busqueda:str):
     click_barra = driver.find_element(By.XPATH,'/html/body/div[7]/div/div/div/button[2]')
     click_barra.click()
 
+    # Seleccionamos juego
     try:
         time.sleep(1.5)
         sel_game = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/section/div/ul/li[1]/div/a/div/div/div[1]/span[2]/img[2]'))
@@ -53,6 +56,8 @@ async def titulo(busqueda:str):
     except TimeoutException:
         print(f"Timed out waiting for game to appear, game number {v.game}, número de intentos {v.intentos}")
 
+    # Obtenemos la id del juego para poderla comparar con otras store
+    
     dict_completo = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@data-qa='mfeCtaMain#cta#action']")))
     data_telemetry_meta = dict_completo.get_attribute('data-telemetry-meta')
     id_game = json.loads(data_telemetry_meta)['conceptId']
@@ -79,8 +84,10 @@ async def titulo(busqueda:str):
                 soup = bs.BeautifulSoup(response.text, features="lxml")
                 dict_completo = soup.find('button',attrs={'data-qa':'mfeCtaMain#cta#action'}).get_attribute_list('data-telemetry-meta')[0]
                 conv_json = json.loads(dict_completo)
-                
-                title = conv_json['productDetail'][0]['productName']
+                try:
+                    title = conv_json['productDetail'][0]['productName']
+                except:
+                    title = "No definido"
                 try:
                     precio_original_sn_psn = conv_json['productDetail'][0]['productPriceDetail'][0]['originalPriceFormatted']
                 except:
@@ -95,7 +102,7 @@ async def titulo(busqueda:str):
                 except:
                     precio_actual_cn_psn = precio_actual_sn_psn
                 
-                precios.update({f"{title}":{f"Precios_juegos_{i}": [precio_original_sn_psn,precio_actual_sn_psn,precio_actual_cn_psn]}})
+                precios.update({f"{title}_{i}":{f"Precios_juegos_{i}": [precio_original_sn_psn,precio_actual_sn_psn,precio_actual_cn_psn]}})
                 
         return precios
  
