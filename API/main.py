@@ -1,59 +1,101 @@
 import sys
 sys.path.append("../")
+import time
+import bs4 as bs
+import httpx
+import json
+
 from utils import funciones as f
 from utils import clases as c
 from utils import variables as v
 from fastapi import FastAPI
-import bs4 as bs
 from fake_useragent import UserAgent
-import httpx
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+
 app = FastAPI()
 
 @app.get("/")
 async def inicio():
-    return {"Bienvenida": "Bienvenid@ a la API de juegos"}
+    return {"Bienvenida": "Bienvenid@ a la API de juegos de PSN"}
  
-@app.get("/titulo")
+@app.get("/precios")
 async def titulo(busqueda:str):
     
     # Cargamos página inicial
     driver,service,options = f.carga_driver()
     driver.get(v.link_inicial)
     f.carga_pagina_inicial(driver)
-    
+
     # Cargamos cuadro de busqueda
+    search_ = EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/header/div/section/span/span/button'))
+    WebDriverWait(driver, v.timeout).until(search_)
     search = driver.find_element(By.XPATH,'/html/body/div[2]/header/div/section/span/span/button')
     search.click()
+
+    #Cargamos barra
+    barra_ = EC.presence_of_element_located((By.XPATH, '/html/body/div[7]/div/div/div/div[2]/input'))
+    WebDriverWait(driver, v.timeout).until(barra_)
     barra_busqueda = driver.find_element(By.XPATH,'/html/body/div[7]/div/div/div/div[2]/input')
     barra_busqueda.send_keys(busqueda)
-    
+    click_barra = driver.find_element(By.XPATH,'/html/body/div[7]/div/div/div/button[2]')
+    click_barra.click()
+
     try:
-        sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[1]/div/a'))
+        time.sleep(1.5)
+        sel_game = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/section/div/ul/li[1]/div/a/div/div/div[1]/span[2]/img[2]'))
         WebDriverWait(driver, v.timeout).until(sel_game)
+        enl_game = driver.find_element(By.XPATH, '/html/body/div[3]/main/section/div/ul/li[1]/div/a/div/div/div[1]/span[2]/img[2]')
+        enl_game.click()
     except TimeoutException:
         print(f"Timed out waiting for game to appear, game number {v.game}, número de intentos {v.intentos}")
-    
-    response = driver.page_source
 
-    url_game_element = driver.find_element(By.CSS_SELECTOR, f'[data-qa="ems-sdk-grid#productTile0"] a')
-    href_store_es = url_game_element.get_attribute('href')
-    id_game = href_store_es.replace('https://store.playstation.com/es-es/concept/', '')
+    dict_completo = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@data-qa='mfeCtaMain#cta#action']")))
+    data_telemetry_meta = dict_completo.get_attribute('data-telemetry-meta')
+    id_game = json.loads(data_telemetry_meta)['conceptId']
+    driver.quit()
+        
     
-    # id = "228748" # Añadimos el id necesario para coger el titulo que la obtenemos con el otro webscrap, hacemos prueba con un numero concreto
     
     ua = UserAgent()
-    url = f"https://store.playstation.com/es-es/concept/{id_game}" 
+    region_es = 'es-es'
+    region_us = 'en-us'
+    region_jp = 'ja-jp'
+    list_region = [region_es,region_us,region_jp] 
+    
     async with httpx.AsyncClient() as client:
-        headers = {'User-Agent': ua.random}
-        response = await client.get(url, headers=headers)
-        if response.status_code == 200:
-            soup = bs.BeautifulSoup(response.text, features="lxml")
-            title = soup.find("h1", class_="psw-m-b-5 psw-t-title-l psw-t-size-8 psw-l-line-break-word").get_text()
-            return {"title": title}
-        else:
-            return {"error": "No se pudo acceder al sitio web"}
+        precios = {}
+        for i in list_region:
+            
+            url = f"https://store.playstation.com/{i}/concept/{id_game}"
+            headers = {'User-Agent': ua.random}
+            response = await client.get(url, headers=headers)
+            
+            if response.status_code == 200:
+
+                soup = bs.BeautifulSoup(response.text, features="lxml")
+                dict_completo = soup.find('button',attrs={'data-qa':'mfeCtaMain#cta#action'}).get_attribute_list('data-telemetry-meta')[0]
+                conv_json = json.loads(dict_completo)
+                
+                title = conv_json['productDetail'][0]['productName']
+                try:
+                    precio_original_sn_psn = conv_json['productDetail'][0]['productPriceDetail'][0]['originalPriceFormatted']
+                except:
+                    precio_original_sn_psn = "Precio no disponible"
+
+                try:   
+                    precio_actual_sn_psn = conv_json['productDetail'][0]['productPriceDetail'][0]['discountPriceFormatted']
+                except:
+                    precio_actual_sn_psn = "Precio no disponible"
+                try:
+                    precio_actual_cn_psn = conv_json['productDetail'][0]['productPriceDetail'][1]['discountPriceFormatted'] # Precio actual con PSN u otro servicio
+                except:
+                    precio_actual_cn_psn = precio_actual_sn_psn
+                
+                precios.update({f"{title}":{f"Precios_juegos_{i}": [precio_original_sn_psn,precio_actual_sn_psn,precio_actual_cn_psn]}})
+                
+        return precios
+ 

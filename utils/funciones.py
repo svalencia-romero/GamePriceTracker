@@ -17,7 +17,7 @@ def carga_driver():
     """
     service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")
+    options.add_argument("--headless=new")
     # options.add_argument('--start-maximized')  #SOLO EN PC SOBREMESA si fuera necesario.
     driver = webdriver.Chrome(service=service, options=options)
     return driver,service,options
@@ -34,15 +34,15 @@ def carga_pagina_inicial(driver:webdriver):
     timeout = 10
 
 
-    try:
-        butt_coo = EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img'))
-        WebDriverWait(driver, timeout).until(butt_coo)
-    except TimeoutException:
-        print("Timed out waiting for sort button to appear")
+    # try:
+    #     butt_coo = EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img'))
+    #     WebDriverWait(driver, timeout).until(butt_coo)
+    # except TimeoutException:
+    #     print("Timed out waiting for sort button to appear")
 
-    rechazar_cookies = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img')
-    rechazar_cookies.click()
-    driver.implicitly_wait(10)
+    # rechazar_cookies = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img')
+    # rechazar_cookies.click()
+    # driver.implicitly_wait(10)
 
     #vamos a la pestaña de explora
 
