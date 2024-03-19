@@ -3,7 +3,7 @@
 VARIABLES NECESARIAS
 """
 link_inicial = "https://store.playstation.com/"
-link_google = "www.google.es"
+link_google = "https://www.google.es/"
 contador_juegos_real = 1 # Esta linea está creada para comprobar que el flujo de los cambios de páginas con sus juegos está correcto.
 # seleccion de juego
 

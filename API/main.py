@@ -1,10 +1,9 @@
 import sys
 sys.path.append("../")
-import time
 import bs4 as bs
 import httpx
 import json
-
+import time
 from utils import funciones as f
 from utils import clases as c
 from utils import variables as v
@@ -23,16 +22,19 @@ async def inicio():
     return {"Bienvenida": "Bienvenid@ a la API de juegos de PSN"}
 
 @app.get("/cambios_monedas") # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
-async def titulo(moneda:str): 
+async def titulo(moneda:str, ): 
     
     driver,service,options = f.carga_driver()
     driver.get(v.link_google)
-    barra_ = EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea'))
-    WebDriverWait(driver, v.timeout).until(barra_)
-    barra_busqueda = driver.find_element(By.XPATH,'/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea')
+    datos = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[3]/div[3]/span/div/div/div/div[3]/div[1]/button[1]/div')))
+    datos.click()
+    
+    barra_busqueda = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea')))
     barra_busqueda.send_keys(moneda)
-    next_page_number = EC.presence_of_all_elements_located((By.XPATH,'/html/body/div[6]/div/div[12]/div[1]/div[2]/div[2]/div/div/div[1]/div/block-component/div/div[1]/div/div/div/div[1]/div/div/div/div/div/div/div/div/div/div/div[3]/div[1]/div[1]/div[2]/span[1]'))
-    dato = next_page_number.get_attribute()
+    barra_busqueda.submit()
+    
+    dato_ = WebDriverWait(driver, v.timeout).until(EC.visibility_of_element_located((By.XPATH, '//span[@class="DFlfde SwHCTb"]')))
+    dato = dato_.text
     return {f"Cambio_moneda_{moneda}": dato}
     
     
@@ -58,20 +60,47 @@ async def titulo(busqueda:str):
     barra_busqueda.send_keys(busqueda)
     click_barra = driver.find_element(By.XPATH,'/html/body/div[7]/div/div/div/button[2]')
     click_barra.click()
-
-    # Seleccionamos juego
-    try:
-        # time.sleep(1.5)
-        sel_game = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/section/div/ul/li[1]/div/a/div/div/div[1]/span[2]/img[2]'))
-        WebDriverWait(driver, v.timeout).until(sel_game)
-        enl_game = driver.find_element(By.XPATH, '/html/body/div[3]/main/section/div/ul/li[1]/div/a/div/div/div[1]/span[2]/img[2]')
-        enl_game.click()
-    except TimeoutException:
-        print(f"Timed out waiting for game to appear, game number {v.game}, número de intentos {v.intentos}")
-
-    # Obtenemos la id del juego para poderla comparar con otras store
     
-    dict_completo = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@data-qa='mfeCtaMain#cta#action']")))
+    
+    #######
+    # Seleccionamos juego  Todo este codigo esta probado y funciona en ocasiones, hay que ver el flujo y si las variables se reinician         
+    # anunciado = True
+    # while anunciado: # Chequeamos que no es un anunciado ya que no tenemos datos de ello
+            
+    #     sel_game = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/section/div/ul/li[{v.game+1}]/div/a/div/div/div[1]/span[2]/img[2]')))
+    #     sel_game.click()
+        
+    #     texto_1 = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, f'//*[@id="main"]/div/div[1]/div[3]/div[2]/div/div/div/div[2]/div/div/div/div/label/div/span/span/span')))
+    #     texto_1 = texto_1.text
+    #     print(texto_1)
+    #     try: # Además del anunciado, vemos si el id es correcto
+    #         dict_completo = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, "//button[@data-qa='mfeCtaMain#cta#action']")))
+    #         data_telemetry_meta = dict_completo.get_attribute('data-telemetry-meta')
+    #         id_game = json.loads(data_telemetry_meta)['conceptId']
+    #         print(id_game)
+    #     except:
+    #         id_game = 'No hay id'
+        
+    #     if texto_1 == 'Anunciado' or id_game == 'No hay id':
+    #         print('Entra condicional')
+    #         v.game += 1
+    #         driver.back()
+    #         print("sale if")
+    #         continue
+    #     else:
+    #         print("entra else")
+    #         anunciado = False
+    #         print("sale else")
+    #         break
+            
+    # print('Pasamos bucle')
+    ########
+
+    
+    # # Obtenemos la id del juego para poderla comparar con otras store
+    sel_game = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/section/div/ul/li[{v.game+1}]/div/a/div/div/div[1]/span[2]/img[2]')))
+    sel_game.click()
+    dict_completo = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, "//button[@data-qa='mfeCtaMain#cta#action']")))
     data_telemetry_meta = dict_completo.get_attribute('data-telemetry-meta')
     id_game = json.loads(data_telemetry_meta)['conceptId']
     driver.quit()
