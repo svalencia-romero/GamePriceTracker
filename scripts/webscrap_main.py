@@ -231,6 +231,7 @@ while numero_juegos != len(df_juegos[0]):
                     next_page.click()
                     v.page += 1      
                     v.game = 0
+                    continue
                 elif len(df_juegos[2]) == v.limite:
                     # Volvemos a hacer la carga completa de la pagina
                     driver.quit()
