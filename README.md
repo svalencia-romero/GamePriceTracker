@@ -16,7 +16,8 @@ Todo el desarrollo se desarrollara en varias fases:
 
 ### -- Fases posteriores -- 
 
-
+- Implementar nuevas funcionalidades
+- Implementar otras plataformas
 
 
 #### Estructura del Repositorio
