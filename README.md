@@ -1,4 +1,4 @@
-![portada](/psn_offer/img/_73ebf20e-bfe5-4018-b924-2cc75c89ab8d.jpeg)
+![portada](/misc/readme.jpg)
 ## Comparativa de precios en diferentes tiendas de PSN en el tiempo, y en la actualidad a traves de webscraping.
 #### Descripción del Proyecto
 Este proyecto consiste en una aplicación web desarrollada en Streamlit. Su objetivo es proporcionar precios en tiempo real de juegos disponibles en tres tiendas diferentes (ESP-USA-JAP).  
