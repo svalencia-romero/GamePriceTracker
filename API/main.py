@@ -15,13 +15,35 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 
-app = FastAPI()
 
-@app.get("/")
+
+tags_metadata = [
+    {
+        "name": "Inicio",
+        "description": "Bienvenida",
+    },
+    {
+        "name": "monedas",
+        "description": "Devuelve el cambio a Euros de la moneda concreta que queramos, para luego en streamlit hacer el cambio de precio de cada juego",
+    },
+    {
+        "name": "precios",
+        "description": "Devuelve precios de juego id psn España en otras stores en tiempo real",
+    
+    }, 
+    
+]
+app = FastAPI(title="PSN OFFER WBSCRP",
+              summary= 'API con FastAPI que webscrapea en tiempo real precios de una busqueda concreta del usuario, cambio de moneda y criterios concretos de juegos',
+                version="0.2",openapi_tags=tags_metadata)
+
+
+
+@app.get("/", tags=['Inicio'])
 async def inicio():
     return {"Bienvenida": "Bienvenid@ a la API de juegos de PSN"}
 
-@app.get("/cambios_monedas") # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
+@app.get("/cambios_monedas/" ,tags=['monedas']) # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
 async def titulo(moneda:str, ): 
     
     driver,service,options = f.carga_driver()
@@ -39,7 +61,7 @@ async def titulo(moneda:str, ):
     
     
     
-@app.get("/precios") # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
+@app.get("/precios/", tags=['precios']) # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
 async def titulo(busqueda:str):
     
     # Cargamos página inicial
