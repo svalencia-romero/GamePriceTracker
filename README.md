@@ -6,7 +6,7 @@ Además, la aplicación mostrará la evolución del precio de cada juego a lo la
 
 Todo el desarrollo se desarrollara en varias fases:  
 
-### --  1ª Fase --  Fase de desarrollo principal
+### --  1ª Fase --  Fase de desarrollo principal  (En desarrollo)
 - Realizar una API con FastAPI que webscrapea en tiempo real precios de una busqueda concreta del usuario, cambio de moneda y criterios concretos de juegos alojada en un servidor PostGreSQL(Elephant).
 - Realizar webscrapeo diario de las 3 tiendas online, comparando los precios de la store Española con la Americana y la Japonesa para ver la relación de precio en el tiempo de un juego o de varios (Alrededor de 8500 juegos aproximadamente).
 - Realizar una primera WebAPP hecha en Streamlit para mostrar estadisticos de esta primera etapa.  
@@ -23,7 +23,7 @@ Todo el desarrollo se desarrollara en varias fases:
 
 #### Estructura del Repositorio
 * API: Desarrollada con FastApi, tendremos los nombres del juego que queramos comprobar y sus precios en tiempo real.
-* app: Funcionan los filtros de búsqueda. Se está considerando una nueva forma de mostrar los precios. (Última actualización ayer).
+* app: Desarrollo de web APP (Streamlit).
 * csv_s: Contiene archivos CSV que se han ido web scrapeando.
 * notebooks: Jupyter Notebooks con información principal de las caracteristicas del proyecto.
 * pruebas: Directorio de pruebas donde se van almacenando los archivos que son descartados.
