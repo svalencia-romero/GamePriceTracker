@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from fake_useragent import UserAgent # "fake_user_agent"
+import psycopg2
 
 def carga_driver():
     """
@@ -182,6 +183,30 @@ def numero_de_juegos(driver,numero=False):
         print("No cargan los numeros de juegos")
     return numero_juegos
 
+def conect_bbdd(database,host,user,password,port):
+    
+    conn = psycopg2.connect(database=database,
+                        host=host,
+                        user=user,
+                        password=password,
+                        port=port)
+    return conn
 
+def sql_query(query,conn):
 
+    cursor = conn.cursor()
+
+    # Ejecuta la query
+    cursor.execute(query)
+
+    # Almacena los datos de la query 
+    ans = cursor.fetchall()
+
+    # Obtenemos los nombres de las columnas de la tabla
+    names = [description[0] for description in cursor.description]
+
+    cursor.close()
+    conn.close()
+
+    return pd.DataFrame(ans,columns=names)
     
