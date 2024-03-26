@@ -25,7 +25,7 @@ CREATE TABLE "genero"(
 
 CREATE TABLE "info_juego"(
     "id_juego" BIGINT PRIMARY KEY,
-    "nombre" VARCHAR(50) NOT NULL,
+    "nombre" VARCHAR(190) NOT NULL,
     "id_compania" BIGINT NOT NULL,
     "numero_calificaciones" BIGINT NOT NULL,
     "num_calificaciones_5_estrellas" BIGINT NOT NULL,
@@ -33,7 +33,8 @@ CREATE TABLE "info_juego"(
     "num_calificaciones_3_estrellas" BIGINT NOT NULL,
     "num_calificaciones_2_estrellas" BIGINT NOT NULL,
     "num_calificaciones_1_estrellas" BIGINT NOT NULL,
-    "calificacion_psn" FLOAT NOT NULL
+    "calificacion_psn" FLOAT NOT NULL,
+    "lanzamiento" DATE NOT NULL
 );
 
 CREATE TABLE "plat_int"(
@@ -86,6 +87,6 @@ ALTER TABLE
 ALTER TABLE
     "plat_int" ADD CONSTRAINT "plat_int_id_plat_foreign" FOREIGN KEY("id_plat") REFERENCES "plataforma"("id_plataforma");
 ALTER TABLE
-    "info_juego" ADD CONSTRAINT "info_juego_id_compania_foreign" FOREIGN KEY("id_compania") REFERENCES "compañia"("id_compania");
+    "info_juego" ADD CONSTRAINT "info_juego_id_compania_foreign" FOREIGN KEY("id_compania") REFERENCES "compania"("id_compania");
 ALTER TABLE
     "genero_int" ADD CONSTRAINT "genero_int_id_juego_foreign" FOREIGN KEY("id_juego") REFERENCES "info_juego"("id_juego");
