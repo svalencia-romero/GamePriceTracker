@@ -5,7 +5,7 @@ import time
 from utils import funciones as f
 
 decision = ""
-
+var_store = "es"
 while decision != "q":
     print('¿Qué operación quieres hacer?:','\n',
           '1 - Limpieza de datos de juegos españoles','\n',
@@ -13,7 +13,7 @@ while decision != "q":
           '3 - Comprobar valores nulos en un csv','\n',
           'q - Salir de script')
     time.sleep(3)
-    decision = input(' 1 / 2 / 3 ')
+    decision = input('Elige sabiamente : (1 - 2 - 3 - q): ')
     
 
     if decision == "1":
@@ -43,10 +43,12 @@ while decision != "q":
 
     elif decision == "3":
         try:
-            ruta = input("Especifica la ruta exacta de tu csv":)
+            ruta = input("Especifica la ruta exacta de tu csv:")
             f.verificar_valores_nulos(ruta)
         except:
             print("Error en ruta")
+    elif decision == "q":
+        continue
     else:
         print("Elige algo que se pueda elegir")
 

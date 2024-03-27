@@ -13,7 +13,7 @@ CREATE TABLE "precio"(
     "id_precio" SERIAL PRIMARY KEY,
     "id_suscripcion" BIGINT NOT NULL,
     "precio" FLOAT NOT NULL,
-    "fecha_webs" DATE NOT NULL,
+    "fecha_webs" TIMESTAMP NOT NULL,
     "id_juego" BIGINT NOT NULL
 );
 
