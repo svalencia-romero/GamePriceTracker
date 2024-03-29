@@ -317,3 +317,11 @@ def verificar_valores_nulos(csv):
         print(f"El archivo '{csv}' tiene valores nulos.")
     else:
         print(f"El archivo '{csv}' no tiene valores nulos.")
+
+def obtener_id_genero(cursor, genero):
+    cursor.execute("SELECT id_genero FROM genero WHERE genero = %s", (genero,))
+    id_genero = cursor.fetchone()
+    if id_genero:
+        return id_genero[0]
+    else:
+        return None

@@ -115,3 +115,86 @@ conn.close()
 
 # Tablas intermedias
 
+#idioma
+contador = 0
+def obtener_id_idioma(cursor, idioma):
+    cursor.execute("SELECT id_lang FROM lang_disp WHERE nombre_lang = %s", (idioma,))
+    id_idioma = cursor.fetchone()
+    if id_idioma:
+        return id_idioma[0]
+    else:
+        return None
+
+def verificar_existencia(cursor, id_juego, id_lang):
+    cursor.execute("SELECT COUNT(*) FROM lang_disp_int WHERE id_juego = %s AND id_lang = %s", (id_juego, id_lang))
+    count = cursor.fetchone()[0]
+    return count > 0
+
+conn = f.conect_bbdd(cr2.database, cr2.host, cr2.user, cr2.password, cr2.port)
+cursor = conn.cursor()
+for index, row in df.iterrows():
+    # Obtener los idiomas de la fila actual
+    idiomas = row['Idiomas'].split(',')
+    
+    # Iterar sobre cada idioma
+    for idioma in idiomas:
+        idioma = idioma.strip()
+        
+        id_idioma = obtener_id_idioma(cursor, idioma)  # Obtener el id del idioma 
+        
+        if id_idioma is not None:
+            id_juego = row['id_juego']
+
+            if not verificar_existencia(cursor, id_juego, id_idioma):
+                cursor.execute("INSERT INTO lang_disp_int (id_juego, id_lang) VALUES (%s, %s)", (id_juego, id_idioma))
+                contador += 1
+                conn.commit()
+            else:
+                print(f"El par (id_juego={id_juego}, id_lang={id_idioma}) ya existe en lang_disp_int, se omitirá la inserción.")
+
+# Cerrar la conexión
+print(f"Se han insertado en la tabla intermedia {contador} registros")
+conn.close()
+
+# Genero
+
+contador = 0
+def obtener_id_genero(cursor, genero):
+    cursor.execute("SELECT id_genero FROM genero WHERE genero = %s", (genero,))
+    id_genero = cursor.fetchone()
+    if id_genero:
+        return id_genero[0]
+    else:
+        return None
+
+def verificar_existencia(cursor, id_juego, id_genero):
+    cursor.execute("SELECT COUNT(*) FROM genero_int WHERE id_juego = %s AND id_genero = %s", (id_juego, id_genero))
+    count = cursor.fetchone()[0]
+    return count > 0
+
+conn = f.conect_bbdd(cr2.database, cr2.host, cr2.user, cr2.password, cr2.port)
+cursor = conn.cursor()
+for index, row in df.iterrows():
+    # Obtener los generos de la fila actual
+    generos = row['Genero'].split(',')
+    
+    # Iterar sobre cada genero
+    for genero in generos:
+        genero = genero.strip()
+        
+        id_genero = obtener_id_genero(cursor, genero)  # Obtener el id del genero
+        
+        if id_genero is not None:
+            id_juego = row['id_juego']
+            if not verificar_existencia(cursor, id_juego, id_genero):
+                cursor.execute("INSERT INTO genero_int (id_juego, id_genero) VALUES (%s, %s)", (id_juego, id_genero))
+                contador += 1
+                conn.commit()
+            else:
+                print(f"El par (id_juego={id_juego}, id_genero={id_genero}) ya existe en genero_int, se omitirá la inserción.")
+
+# Cerrar la conexión
+print(contador)
+conn.close()
+
+
