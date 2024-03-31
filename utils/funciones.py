@@ -9,12 +9,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from fake_useragent import UserAgent # "fake_user_agent"
 import psycopg2
+from datetime import datetime
 
 def carga_driver():
     """
-
+    Inicia y devuelve el objeto driver de Selenium junto con el servicio y las opciones de Chrome.
+    
     Returns:
-        _type_: _description_
+        driver, service, options: Objeto webdriver.Chrome, Service, ChromeOptions
     """
     service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
     options = webdriver.ChromeOptions()
@@ -87,10 +89,16 @@ def pagina_concreta_carga(pagina:int,driver:webdriver):
     
 def limpieza_df_es(df_webscrap:pd.DataFrame, df_webscrap_anterior:pd.DataFrame,var_dia:str,var_store:str)-> pd.DataFrame:
     """
+    Realiza la limpieza del dataframe obtenido del web scraping.
 
     Args:
-        df_webscrap (pd.DataFrame): Dataframe que estamos guardando con el web scrapping y queremos limpiar
-        
+        df_webscrap (pd.DataFrame): Dataframe obtenido del web scraping y a limpiar.
+        df_webscrap_anterior (pd.DataFrame): Dataframe anterior para recuperar información perdida.
+        var_dia (str): Variable para el día.
+        var_store (str): Variable para la tienda.
+
+    Returns:
+        pd.DataFrame: Dataframe limpio.
     """
     
 
@@ -207,7 +215,15 @@ def limpieza_df_es(df_webscrap:pd.DataFrame, df_webscrap_anterior:pd.DataFrame,v
     return 
 
 def clean_mix_df(esp_df_clean:pd.DataFrame,usa_df_no_clean:pd.DataFrame,jap_df_no_clean:pd.DataFrame,var_dia:str):
-    
+    """
+    Realiza la limpieza del dataframe mezclado.
+
+    Args:
+        esp_df_clean (pd.DataFrame): Dataframe limpio de España.
+        usa_df_no_clean (pd.DataFrame): Dataframe no limpio de USA.
+        jap_df_no_clean (pd.DataFrame): Dataframe no limpio de Japón.
+        var_dia (str): Variable para el día.
+    """
     df_mix = esp_df_clean
 
     df_mix["Precio actual con PSN JP"] = jap_df_no_clean["Precio actual con PSN"]
@@ -271,6 +287,16 @@ def clean_mix_df(esp_df_clean:pd.DataFrame,usa_df_no_clean:pd.DataFrame,jap_df_n
     df_mix.to_csv(f"../csv_s/csv_mix_price_id_es/csv_{var_dia}.csv",index=False) # Convertimos a csv para pasar a bbdd
 
 def numero_de_juegos(driver,numero=False):
+    """
+    Obtiene el número de juegos disponibles en la página.
+
+    Args:
+        driver: Objeto webdriver.Chrome
+        numero (bool, optional): Número de juegos. Defaults to False.
+
+    Returns:
+        int: Número de juegos disponibles.
+    """
     if numero != False:
        numero_juegos = numero
     elif numero == False:
@@ -284,6 +310,19 @@ def numero_de_juegos(driver,numero=False):
     return numero_juegos
 
 def conect_bbdd(database,host,user,password,port):
+    """
+    Conecta con la base de datos.
+
+    Args:
+        database (str): Nombre de la base de datos.
+        host (str): Dirección del host.
+        user (str): Usuario de la base de datos.
+        password (str): Contraseña de la base de datos.
+        port (int): Puerto de conexión.
+
+    Returns:
+        connection: Objeto de conexión a la base de datos.
+    """
     
     conn = psycopg2.connect(database=database,
                         host=host,
@@ -294,23 +333,34 @@ def conect_bbdd(database,host,user,password,port):
 
 def sql_query(query,conn):
 
-    cursor = conn.cursor()
+    """
+    Realiza una consulta SQL y devuelve los resultados como un DataFrame.
 
+    Args:
+        query (str): Consulta SQL.
+        conn: Objeto de conexión a la base de datos.
+
+    Returns:
+        pd.DataFrame: Resultados de la consulta.
+    """
+    cursor = conn.cursor()
     # Ejecuta la query
     cursor.execute(query)
-
     # Almacena los datos de la query 
     ans = cursor.fetchall()
-
     # Obtenemos los nombres de las columnas de la tabla
     names = [description[0] for description in cursor.description]
-
     cursor.close()
     conn.close()
-
     return pd.DataFrame(ans,columns=names)
     
 def verificar_valores_nulos(csv):
+    """
+    Verifica si hay valores nulos en un archivo CSV.
+
+    Args:
+        csv (str): Ruta al archivo CSV.
+    """
     df = pd.read_csv(csv)  
       
     if df.isnull().values.any():
@@ -318,10 +368,84 @@ def verificar_valores_nulos(csv):
     else:
         print(f"El archivo '{csv}' no tiene valores nulos.")
 
-def obtener_id_genero(cursor, genero):
-    cursor.execute("SELECT id_genero FROM genero WHERE genero = %s", (genero,))
-    id_genero = cursor.fetchone()
-    if id_genero:
-        return id_genero[0]
+def obtener_id_carc(cursor, carac, id:str,tbl:str, col_tbl:str):
+    """
+    Obtiene el ID de una característica de la tabla.
+
+    Args:
+        cursor: Cursor de la base de datos.
+        carac: Característica.
+        tbl (str): Nombre de la tabla.
+        id (str): ID de la tabla.
+        col_tbl (str): Columna de la tabla.
+
+    Returns:
+        int: ID de la característica.
+    """
+    cursor.execute(f"SELECT {id} FROM {tbl} WHERE {col_tbl} = %s", (carac,))
+    id_carac = cursor.fetchone()
+    if id_carac:
+        return id_carac[0]
     else:
         return None
+
+def verificar_existencia(cursor, id_juego, tab_int:str,id_carac, id_real, id_carac_real):
+    """
+    Verifica si existe una entrada en la tabla intermedia.
+
+    Args:
+        cursor: Cursor de la base de datos.
+        id_juego (str): ID del juego.
+        tab_int (str): Nombre de la tabla intermedia.
+        id_carac (int): ID de la característica.
+        id_real (int): ID real.
+        id_carac_real (int): ID real de la característica.
+
+    Returns:
+        bool: True si la entrada existe, False si no.
+    """
+    cursor.execute(f"SELECT COUNT(*) FROM {tab_int} WHERE {id_juego} = %s AND {id_carac} = %s", (id_real, id_carac_real))
+    count = cursor.fetchone()[0]
+    return count > 0
+    
+def inserts_comp_idiom_gen(cursor,conn,df:pd.DataFrame, col_df:str, tabla:str, col_tbl:str):
+
+    """
+    Inserta los elementos únicos de una columna de un DataFrame en una tabla de una base de datos si no existen.
+
+    Args:
+        cursor: Cursor de la base de datos.
+        conn: Objeto de conexión a la base de datos.
+        df (pd.DataFrame): DataFrame que contiene los datos a insertar.
+        col_df (str): Nombre de la columna del DataFrame que contiene los datos a insertar.
+        tabla (str): Nombre de la tabla de la base de datos donde se insertarán los datos.
+        col_tbl (str): Nombre de la columna de la tabla donde se insertarán los datos.
+
+    Returns:
+        None
+
+    This function inserts unique elements from a DataFrame column into a database table if they do not exist.
+
+    """
+    
+    start_time = datetime.now()
+    contador = 0
+    for caracteristica in df[col_df].str.split(',').explode().str.strip().unique():
+    # Verificar si la caracteristica ya existe en la tabla
+        cursor.execute(f"SELECT COUNT(*) FROM {tabla} WHERE {col_tbl} = %s", (caracteristica,))
+        existe = cursor.fetchone()[0]
+        
+        # Si la caracteristica no existe, insertarlo en la tabla
+        if existe == 0:
+            cursor.execute(f"INSERT INTO {tabla} ({col_tbl}) VALUES (%s)", (caracteristica,))
+            print(f"Insertando {col_df}")
+            conn.commit()
+            contador += 1
+        else:
+            print(f"Ya existe {caracteristica}")
+    print(f"Se han insertado {contador} {col_df}")
+    end_time = datetime.now()
+    total_time = end_time - start_time
+    print(f"Finalizado los inserts de {col_df} en {total_time} ")
+
+    
