@@ -10,6 +10,7 @@ from utils import clases as c
 from utils import variables as v
 import re # Expresiones regulares
 import json
+import time
 import requests
 import pandas as pd
 from datetime import datetime
@@ -20,6 +21,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 lista_recheck = []
+lista_no_info = []
 # Timing
 start_time = datetime.now()
 
@@ -69,7 +71,7 @@ while numero_juegos != len(df_juegos_usa):
             response = requests.get(link_juego, headers=headers)
             soup = bs(response.text,features="lxml")
             
-            print(id_juego,link_juego)
+        
 
         except Exception as e:
             print(f"Error al obtener la URL: error en el juego {v.game}, página {v.page}")
@@ -192,6 +194,16 @@ while numero_juegos != len(df_juegos_usa):
         # precio_con_mayor_rebaja = "No hay información"
         
         # Inserto valores en cada columna
+        intento = 0
+        while calificacion_5 == 'No hay información': # Habrá en algunas ocasiones que ninguno habrá votado a este juego, por tanto se puede esperar que en alguna tarde más de lo debido pero así aseguramos la correcta adquisicion de los datos:
+            print("Comprobando no hay info")
+            intento += 1 
+            time.sleep(2.0)
+            if intento == 3: # Cuando sean 6 segundos, tiempo más que de sobra para coger la info, es posible que la calificacion 5 sea igual a nada.
+                print("No hay info de ese juego en al menos calificaciones")
+                lista_no_info.append((id_juego))
+                break
+        
         df_juegos_usa.loc[len(df_juegos_usa)] = {"id_juego":id_juego,"Titulo":titulo,"Día y hora":fecha_webs,"Plataforma":plataforma,"Genero":genero,"Compañia":compania,"Lanzamiento":lanzamiento,
                                         "Idiomas":idiomas,"Calificación PSN":calificacion,"Número de calificaciones":num_calificaciones,
                                         "Calificación 5 estrellas":calificacion_5,
@@ -200,7 +212,7 @@ while numero_juegos != len(df_juegos_usa):
                                         "Precio original sin PSN":precio_original_sn_psn,"Precio actual sin PSN":precio_actual_sn_psn,"Precio original con PSN":precio_original_cn_psn, "Precio actual con PSN":precio_actual_cn_psn,"País Store":pais_store}
                                         # "Precio con mayor rebaja":precio_con_mayor_rebaja 
         
-        # time.sleep(random.choice(lista_tiempo))
+        
         # chequeo juegos
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
         v.contador_juegos_real += 1
@@ -211,17 +223,6 @@ while numero_juegos != len(df_juegos_usa):
             v.page += 1      
             v.game = 0
             continue
-        # elif len(df_juegos_usa) == limite:
-        #     # Volvemos a hacer la carga completa de la pagina
-        #     driver.quit()
-        #     del driver
-        #     driver,service,options = f.carga_driver()
-        #     driver.get(v.link_inicial_usa)
-        #     f.carga_pagina_inicial_usa(driver)
-        #     f.pagina_concreta_carga(v.page,driver)
-        #     limite += 100
-        #     print("Número de juegos completados de webscrapear", str(len(df_juegos_usa)))
-        #     continue
         else:
             continue
     except:
@@ -257,13 +258,9 @@ driver.quit()
 fecha_acabado = str(datetime.now())
 
 # Para todo completo juegos
-df_juegos_usa.to_csv(f"../csv_s/csv_region/usa/brut/csv_{fecha_acabado[:10]}_usa.csv",index=False)
+df_juegos_usa.to_csv(f"../csv_s/csv_region/usa/brut/csv_{fecha_acabado[:10]}_usa_null.csv",index=False)
 
 print("Grabado con éxito en csv")
-
-# # Para pruebas
-# df_juegos.to_csv(f"../csv_s/csv_sin_limpiar/csv_{fecha_acabado[:10]}_prueba.csv",index=False)
-# print("Grabado con éxito en csv")
 
 end_time = datetime.now()
 total_time = end_time - start_time
@@ -276,6 +273,11 @@ else:
 
 if len(lista_recheck) > 0:
     print("Se necesita checkear estos juegos",lista_recheck)
+else:
+    print("Web scrapeo sin necesidad de recheck")
+
+if len(lista_no_info) > 0:
+    print("Se necesita checkear la info de estos juegos",lista_no_info)
 else:
     print("Web scrapeo sin necesidad de recheck")
 
