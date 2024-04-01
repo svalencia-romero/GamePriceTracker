@@ -40,7 +40,7 @@ df_juegos_jp = df_juegos_es.copy()
 df_juegos = [df_juegos_es,df_juegos_us,df_juegos_jp]
 lista_store = ["ESP","USA","JAP"]
 
-driver.get(v.link_inicial)
+driver.get(v.link_inicial_esp)
 f.carga_pagina_inicial(driver)
 numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
 

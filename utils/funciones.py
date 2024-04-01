@@ -25,6 +25,43 @@ def carga_driver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver,service,options
 
+
+def carga_pagina_inicial_usa(driver:webdriver):
+    '''
+    En esta función estamos haciendo la carga de la página inicial donde más adelante,
+    empezaremos a recoger información sobre todos los juegos de la plataforma
+    
+    argm:
+        driver:webdriver
+    
+    ''' 
+    timeout = 10
+
+    #vamos a la pestaña de explora
+
+    try:
+        expl_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a'))
+        WebDriverWait(driver, timeout).until(expl_butt)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear")
+
+    explora = driver.find_element(By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a')
+    explora.click()
+    
+
+    #return
+
+    # Si queremos ordenar en ascendente 
+    # plat
+    
+    try:
+        sort_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button'))
+        WebDriverWait(driver, timeout).until(sort_butt)
+    except TimeoutException:
+        print("Timed out waiting for sort button to appear") 
+
+    return
+
 def carga_pagina_inicial(driver:webdriver):
     '''
     En esta función estamos haciendo la carga de la página inicial donde más adelante,

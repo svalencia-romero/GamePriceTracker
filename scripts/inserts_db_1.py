@@ -9,7 +9,7 @@ sys.path.append("../")
 # from utils import cred as cr
 from utils import cred_2 as cr2
 from utils import funciones as f
-df_read = pd.read_csv('../csv_s/csv_mix_price_id_es/csv_2024-03-17.csv')
+df_read = pd.read_csv('../csv_s/csv_mix_price_id_es/csv_2024-03-18.csv')
 
 start_time = datetime.now()
 # Las tablas de Suscripcion, plataformas y psn_region una vez hechos los primeros inserts los dejamos tal cual ya que no van a cambiar
