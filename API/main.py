@@ -148,26 +148,27 @@ async def titulo(busqueda:str):
                 title = title_info.precios_y_otras_caracteristicas("Precio no disponible")
                 
                 po_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'originalPriceFormatted']])
-                precio_original_sn_psn = po_sn_psn_info.precios_y_otras_caracteristicas("Precio no disponible",)
+                precio_original_sn_psn = po_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
                 
                 pa_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'discountPriceFormatted']])
-                precio_actual_sn_psn = pa_sn_psn_info.precios_y_otras_caracteristicas("Precio no disponible")
+                promo_1 = pa_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
+                
+                lbl_offer = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'offerApplied']]) 
+                label_promo_1 = lbl_offer.precios_y_otras_caracteristicas("No hay información")
                 
                 pa_cn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',1,'discountPriceFormatted']])
-                precio_actual_cn_psn = pa_cn_psn_info.precios_y_otras_caracteristicas("Precio no disponible")
+                promo_2 = pa_cn_psn_info.precios_y_otras_caracteristicas("No hay información")
                 
-                if precio_actual_cn_psn == "Precio no disponible":
-                    precio_actual_cn_psn = precio_actual_sn_psn 
-                
-                #Precios para otras promos
+                lbl_psn = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',1,'offerBranding']]) 
+                label_promo_2 = lbl_psn.precios_y_otras_caracteristicas("No hay información")
                 
                 otras_promos = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'discountPriceFormatted']])
-                otra_promo = otras_promos.precios_y_otras_caracteristicas("No dispone de promoción extra")
-                lbl_promo = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'offerBranding']])
-                label_promo = lbl_promo.precios_y_otras_caracteristicas("No dispone de promoción extra")
+                promo_3 = otras_promos.precios_y_otras_caracteristicas("No dispone de promoción extra") 
+                lbl_promo = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'offerBranding']]) 
+                label_promo_3 = lbl_promo.precios_y_otras_caracteristicas("No hay información")  
                 
                 
-                precios.update({f"{title}_{i}":{f"Precios_juegos_{i}": [{'Precio_original':precio_original_sn_psn},{"Precio actual sin PSPlus":precio_actual_sn_psn},{f"Precio actual con PSPlus":precio_actual_cn_psn},{f"Precio con promo {label_promo}":otra_promo}]}})
+                precios.update({f"{title}_{i}":{f"Precios_juegos_{i}": [{'Precio_original':precio_original_sn_psn},{f"Precio actual rebajado {label_promo_1}":promo_1},{f"Precio actual con {label_promo_2}":promo_2},{f"Precio con promo {label_promo_3}":promo_3}]}})
                 
         return precios
 
