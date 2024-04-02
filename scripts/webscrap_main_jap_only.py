@@ -20,8 +20,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-lista_recheck = []
-lista_no_info = []
+
 # Timing
 start_time = datetime.now()
 
@@ -41,7 +40,7 @@ df_juegos_jap = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Platafo
 driver.get(v.link_inicial_jp)
 f.carga_pagina_inicial_usa(driver)
 numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
-limite = 5
+
 
 while numero_juegos != len(df_juegos_jap):
     
@@ -86,7 +85,7 @@ while numero_juegos != len(df_juegos_jap):
             if id_juego == id_juego_real_soup:
                 print("Info Check OK")
         except:
-            lista_recheck.append((id_juego))
+            v.lista_recheck.append((id_juego))
             print(f"Necesita recheck {id_juego}")
 
         # Aquí vamos a coger el soup de cada url de cada juego para obtener la info      
@@ -202,7 +201,7 @@ while numero_juegos != len(df_juegos_jap):
             time.sleep(2.0)
             if intento == 3: # Cuando sean 6 segundos, tiempo más que de sobra para coger la info, es posible que la calificacion 5 sea igual a nada.
                 print("No hay info de ese juego en al menos calificaciones")
-                lista_no_info.append((id_juego))
+                v.lista_no_info.append((id_juego))
                 break
         
         df_juegos_jap.loc[len(df_juegos_jap)] = {"id_juego":id_juego,"Titulo":titulo,"Día y hora":fecha_webs,"Plataforma":plataforma,"Genero":genero,"Compañia":compania,"Lanzamiento":lanzamiento,
@@ -259,7 +258,7 @@ driver.quit()
 fecha_acabado = str(datetime.now())
 
 # Para todo completo juegos
-df_juegos_jap.to_csv(f"../csv_s/csv_region/jap/brut/csv_{fecha_acabado[:10]}_jap_prueba_null.csv",index=False)
+df_juegos_jap.to_csv(f"../csv_s/csv_region/jap/brut/csv_{fecha_acabado[:10]}_jap.csv",index=False)
 
 print("Grabado con éxito en csv")
 
@@ -273,12 +272,12 @@ if len(v.list_error) > 0:
 else:
     print("Web scrapeo sin errores")
 
-if len(lista_recheck) > 0:
+if len(v.lista_recheck) > 0:
     print("Se necesita checkear estos juegos",lista_recheck)
 else:
     print("Web scrapeo sin necesidad de recheck")
 
-if len(lista_no_info) > 0:
+if len(v.lista_no_info) > 0:
     print("Se necesita checkear la info de estos juegos",lista_no_info)
 else:
     print("Web scrapeo sin necesidad de recheck")
