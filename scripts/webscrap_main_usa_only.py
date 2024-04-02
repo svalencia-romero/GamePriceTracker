@@ -33,9 +33,9 @@ driver,service,options = f.carga_driver()
 
 
 df_juegos_usa = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Plataforma","Genero","Compañia",
-                                "Lanzamiento","Idiomas","Calificación PSN","Número de calificaciones","Calificación 5 estrellas",
-                                "Calificación 4 estrellas","Calificación 3 estrellas","Calificación 2 estrellas",
-                                "Calificación 1 estrella","Precio original sin PSN","Precio actual sin PSN","Precio original con PSN","Precio actual con PSN","País Store"])
+                                    "Lanzamiento","Idiomas","Calificación PSN","Número de calificaciones","Calificación 5 estrellas",
+                                    "Calificación 4 estrellas","Calificación 3 estrellas","Calificación 2 estrellas",
+                                    "Calificación 1 estrella","Precio original sin PSN","Promo_1","Promo_2","Promo_3","Etiqueta Precios","País Store"])
 
 driver.get(v.link_inicial_usa)
 f.carga_pagina_inicial_usa(driver)
@@ -112,27 +112,30 @@ while numero_juegos != len(df_juegos_usa):
         
         # Precio original sin PSN
         
-        org_price_without_psn = c.info_game(soup,"span",[{"class":"psw-t-title-s psw-c-t-2 psw-t-strike"},
-                                                    {"class":"psw-t-title-m"}])
-        precio_original_sn_psn = org_price_without_psn.caracteristica_tipo("No hay información")
-
-        # Precio original con PSN
+        po_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'originalPriceFormatted']])
+        precio_original_sn_psn = po_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
         
-        org_price_with_psn = c.info_game(soup,"span",[{'data-qa':'mfeCtaMain#offer1#originalPrice','class':'psw-t-title-s psw-c-t-2 psw-t-strike'},
-                                                    {"class":"psw-t-title-s psw-c-t-2 psw-t-strike"},{"class":"psw-t-title-m"}])
-        precio_original_cn_psn = org_price_with_psn.caracteristica_tipo("No hay información")
-
-        # Precio actual sin PSN
+        lbl_offer = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['skuDetail',0,'skuName']]) 
+        label_no_promo = lbl_offer.precios_y_otras_caracteristicas("No hay información")
         
-        act_price_without_psn = c.info_game(soup,"span",[{'class':"psw-t-title-m psw-m-r-4"},{"class":"psw-t-title-m"}])
-        precio_actual_sn_psn = act_price_without_psn.caracteristica_tipo("No hay información")
-
-        # Precio actual con PSN
+        pa_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'discountPriceFormatted']])
+        promo_1 = pa_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
         
-        act_price_with_psn = c.info_game(soup,"span",[{'data-qa':'mfeCtaMain#offer1#finalPrice','class':'psw-t-title-m psw-m-r-4'},
-                                                    {'class':"psw-t-title-m psw-m-r-4"},{"class":"psw-t-title-m"}])
-        precio_actual_cn_psn = act_price_with_psn.caracteristica_tipo("No hay información")
-
+        lbl_offer = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'offerApplied']]) 
+        label_promo_1 = lbl_offer.precios_y_otras_caracteristicas("No hay información")
+        
+        pa_cn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',1,'discountPriceFormatted']])
+        promo_2 = pa_cn_psn_info.precios_y_otras_caracteristicas("No hay información")
+        
+        lbl_psn = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',1,'offerBranding']]) 
+        label_promo_2 = lbl_psn.precios_y_otras_caracteristicas("No hay información")
+        
+        otras_promos = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'discountPriceFormatted']])
+        promo_3 = otras_promos.precios_y_otras_caracteristicas("No dispone de promoción extra") 
+        lbl_promo = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'offerBranding']]) 
+        label_promo_3 = lbl_promo.precios_y_otras_caracteristicas("No hay información") 
+        
+        label_promos_list = [label_no_promo,label_promo_1,label_promo_2,label_promo_3]
         #Plataforma
         
         pltform = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
@@ -208,8 +211,8 @@ while numero_juegos != len(df_juegos_usa):
                                         "Calificación 5 estrellas":calificacion_5,
                                         "Calificación 4 estrellas":calificacion_4,"Calificación 3 estrellas":calificacion_3,
                                         "Calificación 2 estrellas":calificacion_2,"Calificación 1 estrella":calificacion_1,
-                                        "Precio original sin PSN":precio_original_sn_psn,"Precio actual sin PSN":precio_actual_sn_psn,"Precio original con PSN":precio_original_cn_psn, "Precio actual con PSN":precio_actual_cn_psn,"País Store":pais_store}
-                                        # "Precio con mayor rebaja":precio_con_mayor_rebaja 
+                                        "Precio original sin PSN":precio_original_sn_psn,"Promo_1":promo_1,"Promo_2":promo_2,"Promo_3":promo_3,"Etiqueta Precios":label_promos_list,"País Store":pais_store}
+
         
         
         # chequeo juegos
@@ -271,12 +274,12 @@ else:
     print("Web scrapeo sin errores")
 
 if len(v.lista_recheck) > 0:
-    print("Se necesita checkear estos juegos",lista_recheck)
+    print("Se necesita checkear estos juegos",v.lista_recheck)
 else:
     print("Web scrapeo sin necesidad de recheck")
 
 if len(v.lista_no_info) > 0:
-    print("Se necesita checkear la info de estos juegos",lista_no_info)
+    print("Se necesita checkear la info de estos juegos",v.lista_no_info)
 else:
     print("Web scrapeo sin necesidad de recheck")
 
