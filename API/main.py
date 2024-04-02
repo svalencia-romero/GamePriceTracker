@@ -149,13 +149,10 @@ async def titulo(busqueda:str):
                 
                 po_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'originalPriceFormatted']])
                 precio_original_sn_psn = po_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
-                
+                                
                 pa_sn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'discountPriceFormatted']])
                 promo_1 = pa_sn_psn_info.precios_y_otras_caracteristicas("No hay información")
-                
-                lbl_offer = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',0,'offerApplied']]) 
-                label_promo_1 = lbl_offer.precios_y_otras_caracteristicas("No hay información")
-                
+                                
                 pa_cn_psn_info = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',1,'discountPriceFormatted']])
                 promo_2 = pa_cn_psn_info.precios_y_otras_caracteristicas("No hay información")
                 
@@ -165,10 +162,30 @@ async def titulo(busqueda:str):
                 otras_promos = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'discountPriceFormatted']])
                 promo_3 = otras_promos.precios_y_otras_caracteristicas("No dispone de promoción extra") 
                 lbl_promo = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'offerBranding']]) 
-                label_promo_3 = lbl_promo.precios_y_otras_caracteristicas("No hay información")  
+                label_promo_3 = lbl_promo.precios_y_otras_caracteristicas("No hay información") 
+
+                if label_promo_2 == 'PS_PLUS':
+                    label2 = 'PS_PLUS'
+                    promo_plus = promo_2 
+                elif label_promo_3 == 'PS_PLUS':
+                    label2 = 'PS_PLUS'
+                    promo_plus = promo_3    
+                else:
+                    label2 = 'PS_PLUS'
+                    promo_plus = "No hay promoción"
+
+                if (label_promo_2 == 'EA_ACCESS') or (label_promo_2 == 'UBISOFT_PLUS'):
+                    otra_promo = promo_2
+                    label3 = label_promo_2
+                elif (label_promo_3 == 'EA_ACCESS') or (label_promo_3 == 'UBISOFT_PLUS'):
+                    otra_promo = promo_3
+                    label3 = label_promo_3
+                else:
+                    otra_promo = "No hay promoción"
+                    label3 = "No hay otra promoción"  
+                        
                 
-                
-                precios.update({f"{title}_{i}":{f"Precios_juegos_{i}": [{'Precio_original':precio_original_sn_psn},{f"Precio actual rebajado {label_promo_1}":promo_1},{f"Precio actual con {label_promo_2}":promo_2},{f"Precio con promo {label_promo_3}":promo_3}]}})
+                precios.update({f"{title}_{i}":{f"Precios_juegos_{i}": [{'Precio_original':precio_original_sn_psn},{"Precio actual":promo_1},{f"Precio actual con {label2}":promo_plus},{f"Precio con promo {label3}":otra_promo}]}})
                 
         return precios
 

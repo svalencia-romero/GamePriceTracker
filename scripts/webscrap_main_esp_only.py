@@ -34,7 +34,7 @@ driver,service,options = f.carga_driver()
 df_juegos_esp = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Plataforma","Genero","Compañia",
                                 "Lanzamiento","Idiomas","Calificación PSN","Número de calificaciones","Calificación 5 estrellas",
                                 "Calificación 4 estrellas","Calificación 3 estrellas","Calificación 2 estrellas",
-                                "Calificación 1 estrella","Precio original sin PSN","Promo_1","Promo_2","Promo_3","Etiqueta Precios","País Store"])
+                                "Calificación 1 estrella","Precio original","Oferta","Oferta PSPlus","Otra promo diferente a PSPLUS","País Store"])
 
 driver.get(v.link_inicial_esp)
 f.carga_pagina_inicial(driver)
@@ -132,10 +132,21 @@ while numero_juegos != len(df_juegos_esp):
         promo_3 = otras_promos.precios_y_otras_caracteristicas("No dispone de promoción extra") 
         lbl_promo = c.info_game(soup,'button',[{'data-qa':'mfeCtaMain#cta#action'},'data-telemetry-meta',['productDetail',0,'productPriceDetail',2,'offerBranding']]) 
         label_promo_3 = lbl_promo.precios_y_otras_caracteristicas("No hay información") 
-        
-        label_promos_list = [label_no_promo,label_promo_1,label_promo_2,label_promo_3]
-        
-        
+
+        if label_promo_2 == 'PS_PLUS':
+            promo_plus = promo_2 
+        elif label_promo_3 == 'PS_PLUS':
+            promo_plus = promo_3    
+        else:
+            promo_plus = "No hay información"
+
+        if (label_promo_2 == 'EA_ACCESS') or (label_promo_2 == 'UBISOFT_PLUS'):
+            otra_promo = promo_2
+        elif (label_promo_3 == 'EA_ACCESS') or (label_promo_3 == 'UBISOFT_PLUS'):
+            otra_promo = promo_3
+        else:
+            otra_promo = "No hay otra promoción"
+
         #Plataforma
         
         pltform = c.info_game(soup,"dd",[{'class':'psw-p-r-6 psw-p-r-0@tablet-s psw-t-bold psw-l-w-1/2 psw-l-w-1/6@tablet-s psw-l-w-1/6@tablet-l psw-l-w-1/8@laptop psw-l-w-1/6@desktop psw-l-w-1/6@max',
@@ -210,7 +221,7 @@ while numero_juegos != len(df_juegos_esp):
                                         "Calificación 5 estrellas":calificacion_5,
                                         "Calificación 4 estrellas":calificacion_4,"Calificación 3 estrellas":calificacion_3,
                                         "Calificación 2 estrellas":calificacion_2,"Calificación 1 estrella":calificacion_1,
-                                        "Precio original sin PSN":precio_original_sn_psn,"Promo_1":promo_1,"Promo_2":promo_2,"Promo_3":promo_3,"Etiqueta Precios":label_promos_list,"País Store":pais_store}
+                                        "Precio original":precio_original_sn_psn,"Oferta":promo_1,"Oferta PSPlus":promo_plus,"Otra promo diferente a PSPLUS":otra_promo,"País Store":pais_store}
                                         
         # chequeo juegos
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
