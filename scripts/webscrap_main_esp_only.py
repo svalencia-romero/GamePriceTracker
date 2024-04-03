@@ -227,42 +227,27 @@ while numero_juegos != len(df_juegos_esp):
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
         v.contador_juegos_real += 1
         v.game += 1
-        if v.game == 24:
+        
+        if v.game == 24: 
+            next_page_ec = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]'))
+            WebDriverWait(driver, v.timeout).until(next_page_ec)
             next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
             next_page.click()
             v.page += 1      
             v.game = 0
-            continue
-        else:
-            continue
     except:
         
         # Volvemos a hacer la carga completa de la página
         print(f"Error en la carga juego {v.game}, página {v.page}")
         # Guardamos los errores en una lista
-        if v.intentos == 5: # Hacemos un numero de intentos por si acaso se atasca
-            v.game += 1
-            v.intentos = 0
-            v.list_error.append((v.game,v.page))
-            driver.quit()       
-            del driver
-            driver,service,options = f.carga_driver()
-            driver.get(v.link_inicial_esp)
-            f.carga_pagina_inicial(driver)
-            f.pagina_concreta_carga(v.page,driver)
-            v.game += 1
-            continue
-        else:
-            v.list_error.append((v.game,v.page))
-            driver.quit()       
-            del driver
-            driver,service,options = f.carga_driver()
-            driver.get(v.link_inicial_usa)
-            f.carga_pagina_inicial(driver)
-            f.pagina_concreta_carga(v.page,driver)
-            v.intentos += 1
-            continue # Ponemos continue porque en ciertos juegos se queda pillado
-                  
+        v.list_error.append((v.game,v.page))
+        driver.quit()       
+        del driver
+        driver,service,options = f.carga_driver()
+        driver.get(v.link_inicial_usa)
+        f.carga_pagina_inicial(driver)
+        f.pagina_concreta_carga(v.page,driver)
+        
 driver.quit()
 
 fecha_acabado = str(datetime.now())

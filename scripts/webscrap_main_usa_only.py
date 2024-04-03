@@ -40,7 +40,6 @@ df_juegos_usa = pd.DataFrame(columns=["id_juego","Titulo","Día y hora","Platafo
 driver.get(v.link_inicial_usa)
 f.carga_pagina_inicial_usa(driver)
 numero_juegos = f.numero_de_juegos(driver) # Llamamos a los números de juegos que necesitamos de manera concreta, en caso de no poner juegos saltamos a poner todos los juegos.
-limite = v.limite
 
 while numero_juegos != len(df_juegos_usa):
     driver.implicitly_wait(10)
@@ -49,7 +48,8 @@ while numero_juegos != len(df_juegos_usa):
             sel_game = EC.presence_of_element_located((By.XPATH, f'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/ul/li[{v.game+1}]/div/a'))
             WebDriverWait(driver, v.timeout).until(sel_game)
         except TimeoutException:
-            print(f"Timed out waiting for game to appear, game number {v.game}")
+            print(f"Timed out waiting for game to appear, game number {v.game}, {v.page}")
+            df_juegos_usa.to_csv(f"../csv_s/csv_region/usa/brut/csv_no_terminado_usa.csv",index=False)
             continue # Ponemos continue porque en ciertos juegos se queda pillado
             
         
@@ -70,8 +70,6 @@ while numero_juegos != len(df_juegos_usa):
             response = requests.get(link_juego, headers=headers)
             soup = bs(response.text,features="lxml")
             
-        
-
         except Exception as e:
             print(f"Error al obtener la URL: error en el juego {v.game}, página {v.page}")
             continue # Ponemos continue porque en ciertos juegos se queda pillado y volvemos a reiniciar el bucle
@@ -225,54 +223,41 @@ while numero_juegos != len(df_juegos_usa):
                                         "Calificación 2 estrellas":calificacion_2,"Calificación 1 estrella":calificacion_1,
                                         "Precio original":precio_original_sn_psn,"Oferta":promo_1,"Oferta PSPlus":promo_plus,"Otra promo diferente a PSPLUS":otra_promo,"País Store":pais_store}
 
-        
-        
         # chequeo juegos
         print("contador real",v.contador_juegos_real,"contador_en_df",v.game,v.page)
         v.contador_juegos_real += 1
         v.game += 1
+        
         if v.game == 24:
+            
+            next_page_ec = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]'))
+            WebDriverWait(driver, v.timeout).until(next_page_ec)
             next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
             next_page.click()
             v.page += 1      
             v.game = 0
-            continue
-        else:
-            continue
+
+
     except:
         
         # Volvemos a hacer la carga completa de la página
         print(f"Error en la carga juego {v.game}, página {v.page}")
         # Guardamos los errores en una lista
-        if v.intentos == 5: # Hacemos un numero de intentos por si acaso se atasca
-            v.game += 1
-            v.intentos = 0
-            v.list_error.append((v.game,v.page))
-            driver.quit()       
-            del driver
-            driver,service,options = f.carga_driver()
-            driver.get(v.link_inicial_usa)
-            f.carga_pagina_inicial_usa(driver)
-            f.pagina_concreta_carga(v.page,driver)
-            v.game += 1
-            continue
-        else:
-            v.list_error.append((v.game,v.page))
-            driver.quit()       
-            del driver
-            driver,service,options = f.carga_driver()
-            driver.get(v.link_inicial_usa)
-            f.carga_pagina_inicial_usa(driver)
-            f.pagina_concreta_carga(v.page,driver)
-            v.intentos += 1
-            continue # Ponemos continue porque en ciertos juegos se queda pillado
+        v.list_error.append((v.game,v.page))
+        driver.quit()       
+        del driver
+        driver,service,options = f.carga_driver()
+        driver.get(v.link_inicial_usa)
+        f.carga_pagina_inicial_usa(driver)
+        f.pagina_concreta_carga(v.page,driver)
+        continue # Ponemos continue porque en ciertos juegos se queda pillado
                   
 driver.quit()
 
 fecha_acabado = str(datetime.now())
 
 # Para todo completo juegos
-df_juegos_usa.to_csv(f"../csv_s/csv_region/usa/brut/csv_{fecha_acabado[:10]}_usa_null.csv",index=False)
+df_juegos_usa.to_csv(f"../csv_s/csv_region/usa/brut/csv_{fecha_acabado[:10]}_usa.csv",index=False)
 
 print("Grabado con éxito en csv")
 

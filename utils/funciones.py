@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import sys
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -9,6 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from fake_useragent import UserAgent # "fake_user_agent"
 import psycopg2
+sys.path.append("../")
+from utils import variables as v
 from datetime import datetime
 
 def carga_driver():
@@ -35,13 +38,12 @@ def carga_pagina_inicial_usa(driver:webdriver):
         driver:webdriver
     
     ''' 
-    timeout = 10
-
+    
     #vamos a la pestaña de explora
 
     try:
         expl_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a'))
-        WebDriverWait(driver, timeout).until(expl_butt)
+        WebDriverWait(driver, v.timeout).until(expl_butt)
     except TimeoutException:
         print("Timed out waiting for sort button to appear")
 
@@ -56,7 +58,7 @@ def carga_pagina_inicial_usa(driver:webdriver):
     
     try:
         sort_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button'))
-        WebDriverWait(driver, timeout).until(sort_butt)
+        WebDriverWait(driver, v.timeout).until(sort_butt)
     except TimeoutException:
         print("Timed out waiting for sort button to appear") 
 
@@ -71,12 +73,11 @@ def carga_pagina_inicial(driver:webdriver):
         driver:webdriver
     
     ''' 
-    timeout = 10
 
 
     try:
         butt_coo = EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/div/div[1]/div/div[2]/button/img'))
-        WebDriverWait(driver, timeout).until(butt_coo)
+        WebDriverWait(driver, v.timeout).until(butt_coo)
     except TimeoutException:
         print("Timed out waiting for sort button to appear")
 
@@ -88,7 +89,7 @@ def carga_pagina_inicial(driver:webdriver):
 
     try:
         expl_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/section/div/div/div/ul/li[5]/a'))
-        WebDriverWait(driver, timeout).until(expl_butt)
+        WebDriverWait(driver, v.timeout).until(expl_butt)
     except TimeoutException:
         print("Timed out waiting for sort button to appear")
 
@@ -103,7 +104,7 @@ def carga_pagina_inicial(driver:webdriver):
     
     try:
         sort_butt = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[4]/button'))
-        WebDriverWait(driver, timeout).until(sort_butt)
+        WebDriverWait(driver, v.timeout).until(sort_butt)
     except TimeoutException:
         print("Timed out waiting for sort button to appear") 
 
@@ -119,9 +120,12 @@ def pagina_concreta_carga(pagina:int,driver:webdriver):
     """
     pag = 1
     while pag != pagina:
+        
+        next_page_ec = EC.presence_of_element_located((By.XPATH, '/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]'))
+        WebDriverWait(driver, v.timeout).until(next_page_ec)
+        pag += 1
         next_page = driver.find_element(By.XPATH,'/html/body/div[3]/main/div/section/div/div/div/div[2]/div[2]/div/nav/button[2]')  
         next_page.click()
-        pag += 1
         
     
 def limpieza_df_es(df_webscrap:pd.DataFrame, df_webscrap_anterior:pd.DataFrame,var_dia:str,var_store:str)-> pd.DataFrame:
