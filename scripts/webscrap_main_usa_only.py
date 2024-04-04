@@ -1,4 +1,4 @@
-# 11/03 Hacemos cambios para intentar capturar info de cada store
+######## Web Scrap v1.1 Usa #########
 
 """
 Importamos las librerias necesarias para hacer nuestro webscrapping
@@ -24,9 +24,6 @@ from selenium.common.exceptions import TimeoutException
 # Timing
 start_time = datetime.now()
 
-# MEJORANDO EL SCRAPEO CON CLASES Y FUNCIONES INTEGRADAS
-
-### PRUEBA FUNCIONAL WEBSCRAPING DE X JUEGOS Y TIEMPO UTILIZADO ###
 
 ua = UserAgent()
 driver,service,options = f.carga_driver()
