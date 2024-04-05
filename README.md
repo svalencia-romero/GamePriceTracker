@@ -1,4 +1,4 @@
-![portada](/misc/readme.jpg)
+![portada](/misc/img/readme.jpg)
 ## Game Price Tracker
 ### Comparativa de precios en diferentes tiendas de PSN a lo largo del tiempo, y actualmente a través de webscraping.
 #### Descripción del Proyecto
