@@ -1,15 +1,13 @@
-# EN OBRAS!!! NO EJECUTAR!!
-# Primero haré los inserts en bbdd de prueba (Elephant SQL)
+# Los inserts se van a hacer directamente a la bbdd alojada en Render (Mayor espacio y caracteristicas)
 
 from datetime import datetime
-import psycopg2
 import pandas as pd
 import sys
 sys.path.append("../")
 # from utils import cred as cr
 from utils import cred_2 as cr2
 from utils import funciones as f
-df_read = pd.read_csv('../csv_s/csv_mix_price_id_es/csv_2024-03-18.csv')
+df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-04-02.csv')
 
 start_time = datetime.now()
 # Las tablas de Suscripcion, plataformas y psn_region una vez hechos los primeros inserts los dejamos tal cual ya que no van a cambiar
@@ -131,14 +129,14 @@ print(f'Número de géneros en tabla intermedia :{contador}')
 contador = 0
 
 for index, row in df_read.iterrows():
-    id_sus = [1,4,7,2,5,8,3,6,9]
+    id_sus = [1,4,7,10,2,5,8,11,3,6,9,12]
     for id_suscripcion in id_sus:
-        if id_suscripcion in [1, 4, 7]:  # Sentencias para juegos store española
-            col_precio = "Precio original ESP" if id_suscripcion == 1 else "Precio actual sin PSN ESP" if id_suscripcion == 4 else "Precio actual con PSN ESP"
-        elif id_suscripcion in [2, 5, 8]:  # Sentencias para juegos store USA
-            col_precio = "Precio original USA" if id_suscripcion == 2 else "Precio actual sin PSN USA" if id_suscripcion == 5 else "Precio actual con PSN USA"
+        if id_suscripcion in [1, 4, 7,10]:  # Sentencias para juegos store española
+            col_precio = "Precio original_es" if id_suscripcion == 1 else "Oferta_es" if id_suscripcion == 4 else "Oferta PSPlus_es" if id_suscripcion == 7 else "Otra promo diferente a PSPLUS_es"
+        elif id_suscripcion in [2, 5, 8,12]:  # Sentencias para juegos store USA
+            col_precio = "Precio original_us" if id_suscripcion == 2 else "Oferta_us" if id_suscripcion == 5 else "Oferta PSPlus_us" if id_suscripcion == 8 else "Otra promo diferente a PSPLUS_us"
         else:  # Sentencias para juegos store JP
-            col_precio = "Precio original JP" if id_suscripcion == 3 else "Precio actual sin PSN JP" if id_suscripcion == 6 else "Precio actual con PSN JP"
+            col_precio = "Precio original_jp" if id_suscripcion == 3 else "Oferta_jp" if id_suscripcion == 6 else "Oferta PSPlus_jp" if id_suscripcion == 9 else "Otra promo diferente a PSPLUS_jp"
 
         cursor.execute(
             f"INSERT INTO precio (id_suscripcion, precio, fecha_webs, id_juego) SELECT %s, %s, %s, %s WHERE NOT EXISTS (SELECT 1 FROM precio WHERE id_suscripcion = %s AND precio = %s AND fecha_webs = %s AND id_juego = %s) LIMIT 1",
@@ -149,7 +147,6 @@ for index, row in df_read.iterrows():
         print(f"Tabla precio {contador}")
 
 print(f"ok inserts precios, n de inserts {contador}")
-
 
 # Cerramos conexión
 conn.close()
