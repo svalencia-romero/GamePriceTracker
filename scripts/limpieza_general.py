@@ -226,25 +226,23 @@ df_webscrap["Calificación 3 estrellas"] = ((df_webscrap["Calificación 3 estrel
 df_webscrap["Calificación 2 estrellas"] = ((df_webscrap["Calificación 2 estrellas"]/100)*df_webscrap["Número de calificaciones"]).astype(int)
 df_webscrap["Calificación 1 estrella"] = ((df_webscrap["Calificación 1 estrella"]/100)*df_webscrap["Número de calificaciones"]).astype(int)
 
-df_webscrap["Precio original"] = df_webscrap["Precio original"].str.replace("No hay información","-1")
-df_webscrap["Precio original"] = df_webscrap["Precio original"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1")
+
+df_webscrap["Precio original"] = df_webscrap["Precio original"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace("Nohayinformacin","-1")
 df_webscrap["Precio original"] = df_webscrap["Precio original"].str.replace(",",".")
 df_webscrap["Precio original"] = df_webscrap["Precio original"].astype(float)
 
 
-df_webscrap["Oferta"] = df_webscrap["Oferta"].str.replace("No hay información","-1")
-df_webscrap["Oferta"] = df_webscrap["Oferta"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1")
+df_webscrap["Oferta"] = df_webscrap["Oferta"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace("Nohayinformacin","-1")
 df_webscrap["Oferta"] = df_webscrap["Oferta"].str.replace(",",".")
 df_webscrap["Oferta"] = df_webscrap["Oferta"].astype(float)
 
-df_webscrap["Oferta PSPlus"] = df_webscrap["Oferta PSPlus"].str.replace("No hay información","-1")
-df_webscrap["Oferta PSPlus"] = df_webscrap["Oferta PSPlus"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace('Pruebadejuego','0.5')
+
+df_webscrap["Oferta PSPlus"] = df_webscrap["Oferta PSPlus"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace('Pruebadejuego','0.5').replace("Nohayinformacin","-1")
 df_webscrap["Oferta PSPlus"] = df_webscrap["Oferta PSPlus"].str.replace(",",".")
 df_webscrap["Oferta PSPlus"] = df_webscrap["Oferta PSPlus"].astype(float)
 
 
-df_webscrap["Otra promo diferente a PSPLUS"] = df_webscrap["Otra promo diferente a PSPLUS"].str.replace("No hay información","-1")
-df_webscrap["Otra promo diferente a PSPLUS"] = df_webscrap["Otra promo diferente a PSPLUS"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace('Pruebadejuego','0.5').replace("Nohayotrapromocin","-1")
+df_webscrap["Otra promo diferente a PSPLUS"] = df_webscrap["Otra promo diferente a PSPLUS"].str.replace('[^0-9,A-z]','', regex = True).replace('Gratis','0.00').replace("Incluido","0.00").replace("Nodisponibleparacomprar","-1").replace('Anunciado',"-1").replace('Pruebadejuego','0.5').replace("Nohayotrapromocin","-1").replace("Nohayinformacin","-1")
 df_webscrap["Otra promo diferente a PSPLUS"] = df_webscrap["Otra promo diferente a PSPLUS"].str.replace(",",".")
 df_webscrap["Otra promo diferente a PSPLUS"] = df_webscrap["Otra promo diferente a PSPLUS"].astype(float)
 
