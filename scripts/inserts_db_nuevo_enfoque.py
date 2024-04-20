@@ -35,7 +35,10 @@ df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-04-10.csv')
 
 start_time = datetime.now()
 
-# Insertar datos en la tabla info_juego
+''' ############################################################################## '''
+################### Insertar datos en la tabla info_juego ############################
+''' ############################################################################## '''
+
 
 df_rename_info_juegos = df_read.rename(columns={
     'Titulo': 'nombre',
@@ -63,8 +66,30 @@ df_merged[~df_merged['id_juego'].isin(df_read['id_juego'])][['id_juego', 'nombre
             'num_calificaciones_3_estrellas', 'num_calificaciones_2_estrellas',
             'num_calificaciones_1_estrellas', 'calificacion_psn', 'lanzamiento']].to_sql('info_juego', con=engine, if_exists='append', index=False)
 
-# Cerrar la conexión
+''' ############################################################################## '''
+####################### Insertamos la tabla plat_int #################################
+''' ############################################################################## '''
 
+
+df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-04-08.csv')
+
+query = "SELECT id_plat,id_juego FROM public.plat_int"
+df_plat_bbdd = pd.read_sql(query, engine)
+
+datos_id_plat = []
+
+for index, row in df_read.iterrows():
+    if "PS4" in row["Plataforma"]:
+        datos_id_plat.append({"id_juego": row["id_juego"], "id_plat": 1})
+    if "PS5" in row["Plataforma"]:
+        datos_id_plat.append({"id_juego": row["id_juego"], "id_plat": 2})
+df_nuevo_plat_int = pd.DataFrame(datos_id_plat)
+
+df_nuevo_plat_int[~df_nuevo_plat_int['id_juego'].isin(df_plat_bbdd['id_juego'])][['id_plat','id_juego']].to_sql('plat_int', con=engine, if_exists='append', index=False)
+
+
+
+# Cerrar la conexión
 engine.dispose()
 
 end_time = datetime.now()
