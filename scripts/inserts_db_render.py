@@ -30,7 +30,7 @@ cursor = conn.cursor()
 
 f.inserts_comp_idiom_gen(cursor,conn,df_read,list_compania[0],list_compania[1],list_compania[2])
 
-#Idioma
+# Idioma
 
 f.inserts_comp_idiom_gen(cursor,conn,df_read,list_idioma[0],list_idioma[1],list_idioma[2])
 

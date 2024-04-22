@@ -26,7 +26,6 @@ CREATE TABLE "genero"(
 CREATE TABLE "info_juego"(
     "id_juego" BIGINT PRIMARY KEY,
     "nombre" VARCHAR(190) NOT NULL,
-    "id_compania" BIGINT NOT NULL,
     "numero_calificaciones" BIGINT NOT NULL,
     "num_calificaciones_5_estrellas" BIGINT NOT NULL,
     "num_calificaciones_4_estrellas" BIGINT NOT NULL,
@@ -70,6 +69,12 @@ CREATE TABLE "psn_region"(
     "region" VARCHAR(20) NOT NULL
 );
 
+CREATE TABLE "compania_int"(
+    "id_interm_compania" SERIAL PRIMARY KEY,
+    "id_compania" BIGINT NOT NULL,
+    "id_juego" BIGINT NOT NULL
+);
+
 ALTER TABLE
     "suscripcion" ADD CONSTRAINT "suscripcion_id_region_foreign" FOREIGN KEY("id_region") REFERENCES "psn_region"("id_psn");
 ALTER TABLE
@@ -87,6 +92,8 @@ ALTER TABLE
 ALTER TABLE
     "plat_int" ADD CONSTRAINT "plat_int_id_plat_foreign" FOREIGN KEY("id_plat") REFERENCES "plataforma"("id_plataforma");
 ALTER TABLE
-    "info_juego" ADD CONSTRAINT "info_juego_id_compania_foreign" FOREIGN KEY("id_compania") REFERENCES "compania"("id_compania");
-ALTER TABLE
     "genero_int" ADD CONSTRAINT "genero_int_id_juego_foreign" FOREIGN KEY("id_juego") REFERENCES "info_juego"("id_juego");
+ALTER TABLE
+    "compania_int" ADD CONSTRAINT "compania_int_id_compania_foreign" FOREIGN KEY("id_compania") REFERENCES "compania"("id_compania");
+ALTER TABLE
+    "compania_int" ADD CONSTRAINT "compania_int_id_juego_foreign" FOREIGN KEY("id_juego") REFERENCES "info_juego"("id_juego");
