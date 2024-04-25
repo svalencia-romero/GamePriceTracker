@@ -8,9 +8,11 @@ from utils import cred_aws as cr_aws
 from utils import funciones as f
 
 start_time = datetime.now()
-
 # Leer el DataFrame
-df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-04-20.csv')
+date = input("¿Que fecha quieres limpiar? (Formato : yyyy-mm-dd)")
+df_read = pd.read_csv(f"../csv_s/csv_final_mix_to_db/csv_{date}.csv")
+
+
 
 list_genero = ['Genero','genero','genero']
 list_idioma = ['Idiomas','lang_disp','nombre_lang']
