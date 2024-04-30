@@ -25,6 +25,9 @@ df_union = pd.concat([df_merge, df_not_found], ignore_index=True)
 
 df_union.fillna(-1,inplace=True) # Al final como tenemos en nuestra leyenda, si no hay valores de oferta es igual a -1
 
+# Borramos los juegos que no tienen plataforma
+df_union.drop(df_union[df_union["Plataforma"] == "No hay información"].index,inplace=True)
+
 # Dejamos las columnas preparadas para la insercion en nuestra db
 df_union = df_union.rename(columns= {'Precio original':'Precio original_es','Oferta':'Oferta_es','Oferta PSPlus':'Oferta PSPlus_es','Otra promo diferente a PSPLUS':'Otra promo diferente a PSPLUS_es'})
 df_union.to_csv(f"../csv_s/csv_final_mix_to_db/csv_{date}.csv",index=False)

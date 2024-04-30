@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
-prueba_df = pd.read_csv("../csv_s/csv_limpio/es/csv_limpio_2024-03-13.csv")
+prueba_df = pd.read_csv("../csv_s/csv_final_mix_to_db/Insertados/csv_2024-04-25.csv")
 
 # Configuración de página
 st.set_page_config(page_title="Precios de Videojuegos", page_icon="🎮")
@@ -53,7 +53,7 @@ st.dataframe(prueba_df)
 filtered_data = prueba_df[
     (prueba_df["Plataforma"].str.contains(fr'\b{platform}\b', na=False)) &
     (prueba_df["Genero"] == genre) &
-    (prueba_df["Precio actual con PSN"].between(price_range[0], price_range[1])) &
+    (prueba_df["Precio original_es"].between(price_range[0], price_range[1])) &
     (prueba_df["Idiomas"].str.contains(fr'\b{idioma}\b', na=False))
 
 ]
@@ -62,6 +62,6 @@ filtered_data = prueba_df[
 st.subheader("Resultados")
 if len(filtered_data) > 0:
     for index, game in filtered_data.iterrows():
-        st.write(f"**{game['Titulo']}** - {game['Plataforma']} - {game['Genero']} - €{game['Precio actual con PSN']}")
+        st.write(f"**{game['Titulo']}** - {game['Plataforma']} - {game['Genero']} - €{game['Precio original_es']}")
 else:
     st.warning("No se encontraron juegos que coincidan con los filtros seleccionados.")
