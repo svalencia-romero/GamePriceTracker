@@ -3,7 +3,6 @@ sys.path.append("../")
 import bs4 as bs
 import httpx
 import json
-import time
 from utils import funciones as f
 from utils import clases as c
 from utils import variables as v
@@ -12,7 +11,7 @@ from fake_useragent import UserAgent
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+import uvicorn
 
 
 
@@ -34,7 +33,7 @@ tags_metadata = [
     
 ]
 app = FastAPI(title="PSN OFFER WBSCRP",
-              summary= 'API con FastAPI que webscrapea en tiempo real precios de una busqueda concreta del usuario, cambio de moneda y criterios concretos de juegos',
+              summary= 'API que webscrapea en tiempo real precios de una busqueda concreta del usuario, cambio de moneda y criterios concretos de juegos',
                 version="0.2",openapi_tags=tags_metadata)
 
 
@@ -44,7 +43,7 @@ async def inicio():
     return {"Bienvenida": "Bienvenid@ a la API de juegos de PSN"}
 
 @app.get("/cambios_monedas/" ,tags=['monedas']) # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
-async def titulo(moneda:str, ): 
+async def titulo(moneda:str): 
     
     driver,service,options = f.carga_driver()
     driver.get(v.link_google)
@@ -189,5 +188,5 @@ async def titulo(busqueda:str):
                 
         return precios
 
-
-
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
