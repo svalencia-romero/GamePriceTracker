@@ -1,6 +1,12 @@
 import pandas as pd
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
 import re
 import sys
+sys.path.append("../")
+from utils import variables as v
+from datetime import datetime
+
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,9 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from fake_useragent import UserAgent # "fake_user_agent"
 import psycopg2
-sys.path.append("../")
-from utils import variables as v
-from datetime import datetime
+
 
 def carga_driver():
     """
@@ -22,6 +26,21 @@ def carga_driver():
         driver, service, options: Objeto webdriver.Chrome, Service, ChromeOptions
     """
     service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe')
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    # options.add_argument('--start-maximized')  #SOLO EN PC SOBREMESA si fuera necesario.
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver,service,options
+
+def carga_driver_docker():
+    """
+    Inicia y devuelve el objeto driver de Selenium junto con el servicio y las opciones de Chrome.
+    
+    Returns:
+        driver, service, options: Objeto webdriver.Chrome, Service, ChromeOptions
+    """
+    # service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe') en local
+    service = Service(executable_path=dir_path + '/chromedriver.exe')
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     # options.add_argument('--start-maximized')  #SOLO EN PC SOBREMESA si fuera necesario.
