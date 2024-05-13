@@ -75,7 +75,7 @@ async def titulo(moneda:str):
 async def titulo(busqueda:str):
     
     # Cargamos página inicial
-    driver,service,options = f.carga_driver()
+    driver,service,options = f.carga_driver_docker()
     driver.get(v.link_inicial)
     f.carga_pagina_inicial(driver)
 
