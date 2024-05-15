@@ -1,7 +1,9 @@
 import os
 import sys
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(dir_path,".."))
+os.chdir(dir_path)
+sys.path.append(os.path.join(dir_path, ".."))
+
 import bs4 as bs
 import httpx
 import json
@@ -16,7 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import uvicorn
-print(os.getcwd())
+
 
 favicon_path = "../misc/img/favicon.ico"
 
@@ -56,9 +58,9 @@ async def inicio():
 @app.get("/cambios_monedas/" ,tags=['monedas']) # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
 async def titulo(moneda:str): 
     
-    driver,service,options = f.carga_driver_docker()
+    driver,service,options = f.carga_driver()
     driver.get(v.link_google)
-    datos = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[3]/div[3]/span/div/div/div/div[3]/div[1]/button[1]/div')))
+    datos = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[3]/span/div/div/div/div[3]/div[1]/button[2]/div')))
     datos.click()
     
     barra_busqueda = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/textarea')))

@@ -1,7 +1,9 @@
 import os
 import sys
 dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(dir_path,".."))
+os.chdir(dir_path)
+sys.path.append(os.path.join(dir_path, ".."))
+
 import bs4 as bs
 import httpx
 import json

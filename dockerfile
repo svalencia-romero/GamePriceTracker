@@ -1,11 +1,17 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y wget gnupg unzip
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
-RUN apt-get update && apt-get install -y google-chrome-stable
-RUN wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/{124.0.6367.201}/chromedriver_linux64.zip
-RUN unzip /tmp/chromedriver.zip -d /usr/local/bin/
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y \
+    google-chrome-stable \
+    && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/98.0.4758.48/chromedriver_linux64.zip \
+    && unzip /tmp/chromedriver.zip -d /usr/bin/ \
+    && rm /tmp/chromedriver.zip \
+    && chmod +x /usr/bin/chromedriver
 
 RUN mkdir /src
 WORKDIR /src
