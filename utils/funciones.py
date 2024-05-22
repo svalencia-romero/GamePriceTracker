@@ -8,6 +8,7 @@ from utils import variables as v
 from datetime import datetime
 
 from bs4 import BeautifulSoup as bs
+from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -39,13 +40,15 @@ def carga_driver_docker():
     Returns:
         driver, service, options: Objeto webdriver.Chrome, Service, ChromeOptions
     """
-    # service = Service(executable_path='../../psn_env/Lib/site-packages/selenium/webdriver/chrome/chromedriver.exe') en local
-    service = Service(executable_path=dir_path + '/chromedriver.exe')
-    options = webdriver.ChromeOptions()
+    options = Options()
     options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     # options.add_argument('--start-maximized')  #SOLO EN PC SOBREMESA si fuera necesario.
-    driver = webdriver.Chrome(service=service, options=options)
-    return driver,service,options
+    driver = webdriver.Remote(
+        command_executor='http://selenium-chrome:4444/wd/hub',
+        options=options)
+    return driver,options
 
 
 def carga_pagina_inicial_usa(driver:webdriver):

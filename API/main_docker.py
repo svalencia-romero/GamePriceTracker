@@ -58,7 +58,7 @@ async def inicio():
 @app.get("/cambios_monedas/" ,tags=['monedas']) # Idea de añadir otro input para así elegir que juegos escoger o que numero de juegos que se relacionen con esa busqueda
 async def titulo(moneda:str): 
     
-    driver,service,options = f.carga_driver()
+    driver,options = f.carga_driver_docker()
     driver.get(v.link_google)
     datos = WebDriverWait(driver, v.timeout).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div[3]/span/div/div/div/div[3]/div[1]/button[2]/div')))
     datos.click()
@@ -77,7 +77,7 @@ async def titulo(moneda:str):
 async def titulo(busqueda:str):
     
     # Cargamos página inicial
-    driver,service,options = f.carga_driver_docker()
+    driver,options = f.carga_driver_docker()
     driver.get(v.link_inicial)
     f.carga_pagina_inicial(driver)
 

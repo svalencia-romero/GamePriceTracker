@@ -1,0 +1,19 @@
+version: '3'
+services:
+  selenium_chrome_standalone:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium_chrome_standalone
+    ports:
+      - "4444:4444"
+
+  api_psn:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: api_psn
+    depends_on:
+      - selenium_chrome_standalone
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
