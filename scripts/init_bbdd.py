@@ -1,19 +1,29 @@
 
 # ------------ SOLO EJECUTAR LA PRIMERA VEZ QUE SE INICIALIZA LA BASE DE DATOS --------------------- #
-
+import snowflake.connector
+import snowflake.sqlalchemy
 from datetime import datetime
 import pandas as pd
 from sqlalchemy import create_engine
 import sys
 sys.path.append("../")
+from utils import cred_snow as cr_snw
 from utils import cred_aws as cr_aws
 from utils import cred_2 as cr2
 from utils import funciones as f
 
-df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-04-02.csv')
+df_read = pd.read_csv('../csv_s/csv_final_mix_to_db/csv_2024-05-02.csv')
 
 # En caso de volver a tener que reiniciar la base de datos, desmutear la linea de las conexiones
 # conn = f.conect_bbdd(cr_aws.database, cr_aws.host, cr_aws.user, cr_aws.password, cr_aws.port)
+# conn = snowflake.connector.connect(
+#     user=cr_snw.user,
+#     password=cr_snw.password,
+#     account=cr_snw.account,
+#     warehouse=cr_snw.warehouse,
+#     database=cr_snw.database,
+#     schema=cr_snw.schema
+# )
 cursor = conn.cursor()
 
 # ------------------------------------------------------------------------ #

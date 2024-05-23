@@ -9,7 +9,7 @@ from utils import funciones as f
 
 start_time = datetime.now()
 # Leer el DataFrame
-date = input("¿Que fecha quieres limpiar? (Formato : yyyy-mm-dd)")
+date = input("¿Que fecha quieres insertar? (Formato : yyyy-mm-dd)")
 df_read = pd.read_csv(f"../csv_s/csv_final_mix_to_db/csv_{date}.csv")
 
 
