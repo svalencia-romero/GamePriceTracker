@@ -3,5 +3,7 @@ cred_api_key.py
 cred.py
 cred_2.py
 cred_aws.py
+cred_snow.py
 __pycache__
 __init__.py
+pruebas_snowflake.ipynb

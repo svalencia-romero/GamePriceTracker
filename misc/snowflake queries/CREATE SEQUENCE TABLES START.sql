@@ -1,0 +1,11 @@
+CREATE SEQUENCE suscripcion_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE lang_disp_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE precio_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE genero_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE plat_int_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE genero_int_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE lang_disp_int_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE compania_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE plataforma_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE psn_region_id_seq START = 1 INCREMENT = 1;
+CREATE SEQUENCE compania_int_id_seq START = 1 INCREMENT = 1;
